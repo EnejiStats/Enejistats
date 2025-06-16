@@ -57,3 +57,4 @@ class LeaderboardEntry(BaseModel): player_id: str name: str position: str photo_
 @app.get("/browse/players") def browse_players(): players = list(db.players.find()) for p in players: p["_id"] = str(p["_id"]) return players
 
 @app.get("/browse/clubs") def browse_clubs(): clubs = list(db.clubs.find()) for c in clubs: c["_id"] = str(c["_id"]) return clubs
+
