@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import shutil
+import bcrypt
 
 # Load environment variables from .env file
 load_dotenv()
@@ -53,6 +54,38 @@ async def leaderboard(request: Request):
 async def contact(request: Request):
     return templates.TemplateResponse("contact.html", {"request": request})
 
+@app.get("/login", response_class=HTMLResponse)
+async def get_login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.post("/login", response_class=HTMLResponse)
+async def post_login(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...)
+):
+    user = players_collection.find_one({"email": email})
+
+    if not user:
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "message": "Invalid email or password."
+        })
+
+    stored_password = user["password"]
+    if not bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "message": "Invalid email or password."
+        })
+
+    # Success
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "player": user,
+        "message": "Login successful!"
+    })
+
 # GET: Register form
 @app.get("/register", response_class=HTMLResponse)
 async def get_register(request: Request):
@@ -87,6 +120,9 @@ async def post_register(
             "message": "Only player registration is currently supported."
         })
 
+    # Hash the password before storing
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
     # Save photo to /static/uploads/
     photo_filename = None
     if playerPhoto:
@@ -105,7 +141,7 @@ async def post_register(
         "middleName": middleName,
         "lastName": lastName,
         "email": email,
-        "password": password,  # WARNING: hash in production!
+        "password": hashed_password.decode('utf-8'),  # Store hashed password
         "dob": dob,
         "gender": gender,
         "nationality": playerNationality,
