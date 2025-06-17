@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Enejistats | Home</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f5f7fa; color: #333; }
+    header, footer { background-color: #1e1e2f; color: white; padding: 1rem; text-align: center; }
+    nav a { color: white; margin: 0 0.75rem; text-decoration: none; font-weight: 500; }
+
+    .dropdown { position: relative; display: inline-block; }
+    .dropbtn { color: white; padding: 0.5rem; display: inline-block; cursor: pointer; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #2a2a2a;
+      min-width: 160px;
+      z-index: 1;
+      border-radius: 4px;
+    }
+    .dropdown-content a {
+      color: white;
+      padding: 0.6rem 1rem;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover { background-color: #444; }
+    .dropdown:hover .dropdown-content { display: block; }
+
+    .hero {
+      padding: 2rem 1rem;
+      background: linear-gradient(to right, #004aad, #002b61);
+      color: white;
+      text-align: center;
+    }
+
+    .carousel {
+      margin: 2rem auto;
+      display: flex;
+      overflow: hidden;
+      max-width: 90%;
+      border-radius: 8px;
+    }
+
+    .carousel img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin: 0 1rem;
+      border: 4px solid white;
+    }
+
+    .description-panel {
+      padding: 2rem;
+      background-color: #fff;
+      text-align: center;
+    }
+
+    .description-panel h3 {
+      margin-top: 0;
+      color: #004aad;
+    }
+
+    .description-panel p {
+      max-width: 700px;
+      margin: auto;
+      font-size: 1rem;
+      color: #444;
+    }
+
+    .description-panel a {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      background-color: #004aad;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+
+    footer .links {
+      background-color: #2c3e50;
+      padding: 1rem;
+    }
+
+    footer .links a {
+      color: #ccc;
+      margin: 0 1rem;
+      text-decoration: none;
+    }
+
+    footer p { margin: 0.5rem 0 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Enejistats</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <div class="dropdown">
+      <span class="dropbtn">Stats Area ▾</span>
+      <div class="dropdown-content">
+        <a href="register.html?redirect=player-dashboard.html">Player</a>
+        <a href="browse.html">Browse</a>
+      </div>
+    </div>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="contact.html">Contact</a>
+    <a href="register.html">Register / Sign In</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Top Performers of the Week</h2>
+  <p>Enejistats is a pioneer stats platform empowering grassroots and pro players across Africa and beyond.</p>
+</section>
+
+<section class="carousel" id="carousel">
+  <img src="https://via.placeholder.com/150?text=ST" alt="Striker" />
+  <img src="https://via.placeholder.com/150?text=MID1" alt="Midfielder 1" />
+  <img src="https://via.placeholder.com/150?text=DEF1" alt="Defender 1" />
+  <img src="https://via.placeholder.com/150?text=GK" alt="Goalkeeper" />
+  <img src="https://via.placeholder.com/150?text=DEF2" alt="Defender 2" />
+  <img src="https://via.placeholder.com/150?text=MID2" alt="Midfielder 2" />
+</section>
+
+<section class="description-panel">
+  <h3>Discover the Full Platform</h3>
+  <p>
+    Whether you're a player looking to showcase match stats, a club managing talent, or a scout tracking prospects —
+    Enejistats provides all the tools in one place.
+  </p>
+  <a href="register.html">Register / Sign In</a>
+</section>
+
+<footer>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="contact.html">Contact</a>
+    <a href="register.html">Register</a>
+  </div>
+  <p>&copy; 2025 Enejistats. All rights reserved.</p>
+</footer>
+
+<script>
+  // Auto-scroll carousel every 5 seconds
+  const carousel = document.getElementById("carousel");
+  setInterval(() => {
+    carousel.appendChild(carousel.children[0]);
+  }, 5000);
+</script>
+
+</body>
+</html>
