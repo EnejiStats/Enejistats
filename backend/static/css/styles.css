@@ -1,0 +1,101 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
+}
+header, footer {
+  background-color: #1e1e2f;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+nav a {
+  color: white;
+  margin: 0 0.75rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropbtn {
+  color: white;
+  padding: 0.5rem;
+  display: inline-block;
+  cursor: pointer;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #2a2a2a;
+  min-width: 160px;
+  z-index: 1;
+  border-radius: 4px;
+}
+.dropdown-content a {
+  color: white;
+  padding: 0.6rem 1rem;
+  text-decoration: none;
+  display: block;
+}
+.dropdown-content a:hover { background-color: #444; }
+.dropdown:hover .dropdown-content { display: block; }
+
+.hero {
+  padding: 2rem 1rem;
+  background: linear-gradient(to right, #004aad, #002b61);
+  color: white;
+  text-align: center;
+}
+.carousel {
+  margin: 2rem auto;
+  display: flex;
+  overflow: hidden;
+  max-width: 90%;
+  border-radius: 8px;
+}
+.carousel img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 1rem;
+  border: 4px solid white;
+}
+.description-panel {
+  padding: 2rem;
+  background-color: #fff;
+  text-align: center;
+}
+.description-panel h3 {
+  margin-top: 0;
+  color: #004aad;
+}
+.description-panel p {
+  max-width: 700px;
+  margin: auto;
+  font-size: 1rem;
+  color: #444;
+}
+.description-panel a {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #004aad;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+}
+footer .links {
+  background-color: #2c3e50;
+  padding: 1rem;
+}
+footer .links a {
+  color: #ccc;
+  margin: 0 1rem;
+  text-decoration: none;
+}
+footer p { margin: 0.5rem 0 0; }
