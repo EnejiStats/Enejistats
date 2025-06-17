@@ -99,6 +99,9 @@ footer .links a {
   text-decoration: none;
 }
 footer p { margin: 0.5rem 0 0; }
+/* =====================
+   Stats Area Page Styles
+   ===================== */
 .tabs {
   display: flex;
   justify-content: center;
