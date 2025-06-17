@@ -1,10 +1,15 @@
 
+import os
 from fastapi import FastAPI, Request, Form, UploadFile, File
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pymongo import MongoClient
-import shutil, os
+from dotenv import load_dotenv
+import shutil
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI()
 
@@ -14,10 +19,14 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Set up template directory
 templates = Jinja2Templates(directory="templates")
 
-# MongoDB connection
-client = MongoClient(os.getenv("MONGO_URI"))
-db = client.enejistats
-players_collection = db.players
+# Connect to MongoDB
+MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    raise ValueError("MONGO_URI not set in environment.")
+
+client = MongoClient(MONGO_URI)
+db = client["enejistats"]
+players_collection = db["players"]
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
@@ -113,3 +122,7 @@ async def post_register(
         "request": request,
         "message": "Registration successful!"
     })
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5000)
