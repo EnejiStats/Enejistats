@@ -4,7 +4,7 @@ setInterval(() => {
   carousel.appendChild(carousel.children[0]);
 }, 5000);
 /* =====================
-   Browse Page Styles
+   Browse script starts here
    ===================== */
 
 function filterPlayers() {
@@ -18,6 +18,7 @@ function filterPlayers() {
 }
 
 /* ==============================
-   Leaderboard script starts here
+   Contact us script starts here
    ============================== */
-
+// Set current year in footer
+document.getElementById("year").textContent = new Date().getFullYear();
