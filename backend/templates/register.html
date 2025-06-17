@@ -1,0 +1,153 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register | Enejistats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <script src="/static/js/register.js" defer></script>
+</head>
+<body><header>
+  <h1>Enejistats</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <div class="dropdown">
+      <span class="dropbtn">Stats Area ▾</span>
+      <div class="dropdown-content">
+        <a href="/stats/player">Player</a>
+        <a href="/stats/browse">Browse</a>
+      </div>
+    </div>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/contact">Contact</a>
+    <a href="/register">Register / Sign In</a>
+  </nav>
+</header><main>
+  <h2>User Registration</h2>
+  <form id="registrationForm" method="POST" action="/register" enctype="multipart/form-data">
+    <label for="userType">User Type</label>
+    <select id="userType" name="userType" onchange="displayFields()" required>
+      <option value="">-- Select User Type --</option>
+      <option value="player">Player</option>
+      <option value="club">Club</option>
+      <option value="scout">Scout / Agent</option>
+    </select><!-- Player Fields -->
+<fieldset id="playerFields" class="user-fields hidden">
+  <legend>Player Details</legend>
+
+  <label for="firstName">First Name</label>
+  <input type="text" id="firstName" name="firstName" required />
+
+  <label for="middleName">Middle Name (Optional)</label>
+  <input type="text" id="middleName" name="middleName" />
+
+  <label for="lastName">Last Name</label>
+  <input type="text" id="lastName" name="lastName" required />
+
+  <label for="email">Email Address</label>
+  <input type="email" id="email" name="email" required />
+
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required />
+
+  <label for="dob">Date of Birth</label>
+  <input type="date" id="dob" name="dob" required />
+
+  <label for="gender">Gender</label>
+  <select id="gender" name="gender" required>
+    <option value="">Select</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+    <option value="other">Other</option>
+  </select>
+
+  <label for="playerNationality">Nationality</label>
+  <select id="playerNationality" name="playerNationality" required>
+    <option value="">Select Country</option>
+  </select>
+
+  <label for="playerPhoto">Passport Photo (Max 20KB)</label>
+  <input type="file" id="playerPhoto" name="playerPhoto" accept="image/*" required />
+
+  <label for="dominantFoot">Dominant Foot</label>
+  <select id="dominantFoot" name="dominantFoot" required>
+    <option value="">Select</option>
+    <option value="left">Left</option>
+    <option value="right">Right</option>
+    <option value="both">Both</option>
+  </select>
+
+  <label for="height">Height (cm)</label>
+  <input type="number" id="height" name="height" required />
+
+  <label for="weight">Weight (kg)</label>
+  <input type="number" id="weight" name="weight" required />
+
+  <label for="league">League</label>
+  <select id="league" name="league" onchange="handleLeagueChange()" required>
+    <option value="">Select League</option>
+    <option value="npfl">Nigerian Professional Football League</option>
+    <option value="nnl1">Nigerian National League One</option>
+    <option value="nnl2">Nigerian National League Two</option>
+    <option value="academy">Academy</option>
+    <option value="amateur">Amateur Clubs</option>
+    <option value="university">University</option>
+  </select>
+
+  <div id="leagueClubDropdown" class="hidden">
+    <label for="leagueClub">Select Club/Team</label>
+    <select id="leagueClub" name="leagueClub" required>
+      <option value="">Select Club/Team</option>
+    </select>
+  </div>
+
+  <div id="generalClubDropdown" class="hidden">
+    <label for="generalClub">Select Club/Team</label>
+    <select id="generalClub" name="generalClub" required>
+      <option value="">Select Club/Team</option>
+    </select>
+  </div>
+
+  <label for="clubAssociation">Club Association</label>
+  <select id="clubAssociation" name="clubAssociation" onchange="toggleClubDropdown()" required>
+    <option value="no">No</option>
+    <option value="yes">Yes</option>
+  </select>
+
+  <div id="clubDropdown" class="hidden">
+    <label for="club">Select Club</label>
+    <select id="club" name="club" required>
+      <option value="">Select Club</option>
+    </select>
+  </div>
+</fieldset>
+
+<!-- Club Fields -->
+<fieldset id="clubFields" class="user-fields hidden">
+  <legend>Club Registration</legend>
+  <div class="coming-soon">Coming Soon</div>
+</fieldset>
+
+<!-- Scout Fields -->
+<fieldset id="scoutFields" class="user-fields hidden">
+  <legend>Scout/Agent Registration</legend>
+  <div class="coming-soon">Coming Soon</div>
+</fieldset>
+
+<button type="submit">Register</button>
+
+  </form>
+</main><footer>
+  <div class="links">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/stats">Stats Area</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/contact">Contact</a>
+    <a href="/register">Register</a>
+  </div>
+  <p>&copy; <span id="year"></span> Enejistats. All rights reserved.</p>
+</footer><script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script></body>
+  </html>
