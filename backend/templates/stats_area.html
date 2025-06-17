@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stats Area | Enejistats</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+<header>
+  <h1>Enejistats</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+
+    <div class="dropdown">
+      <span class="dropbtn">Stats Area ▾</span>
+      <div class="dropdown-content">
+        <a href="/stats/player">Player</a>
+        <a href="/stats/browse">Browse</a>
+      </div>
+    </div>
+
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/contact">Contact</a>
+    <a href="/register">Register / Sign In</a>
+  </nav>
+</header>
+
+<section class="tabs">
+  <button onclick="window.location.href='/register?redirect=player-dashboard.html'">Player</button>
+  <button onclick="window.location.href='/stats/browse'">Browse</button>
+</section>
+
+<section class="content-area">
+  <p>Select a tab above to either log in and view your personal stats, or browse public player statistics.</p>
+</section>
+
+<footer>
+  <div class="links">
+    <a href="/">Return to Home</a>
+  </div>
+  <p>&copy; 2025 Enejistats. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
