@@ -342,3 +342,76 @@ h2 {
   margin: 0.25rem 0 1rem;
   color: #444;
 }
+
+/* =====================
+   Register Page Styles
+   ===================== */
+main {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+form input,
+form select {
+  padding: 0.6rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 0.3rem;
+  width: 100%;
+}
+
+.hidden {
+  display: none;
+}
+
+fieldset {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+
+legend {
+  padding: 0 0.5rem;
+  font-weight: bold;
+  color: #004aad;
+}
+
+button {
+  margin-top: 2rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background-color: #004aad;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background-color: #00357a;
+}
+
+.coming-soon {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  font-size: 1.1rem;
+  padding: 2rem;
+}
