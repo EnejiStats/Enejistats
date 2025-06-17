@@ -16,3 +16,8 @@ function filterPlayers() {
     card.style.display = name.includes(input) ? "block" : "none";
   });
 }
+
+/* ==============================
+   Leaderboard script starts here
+   ============================== */
+
