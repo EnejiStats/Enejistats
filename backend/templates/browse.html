@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Players | Enejistats</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+<header>
+  <h1>Enejistats</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <div class="dropdown">
+      <span class="dropbtn">Stats Area ▾</span>
+      <div class="dropdown-content">
+        <a href="/stats/player">Player</a>
+        <a href="/stats/browse">Browse</a>
+      </div>
+    </div>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/contact">Contact</a>
+    <a href="/register">Register / Sign In</a>
+  </nav>
+</header>
+
+<section class="browse-section">
+  <h2>Browse Player Stats</h2>
+  <input type="text" id="searchInput" placeholder="Search player name..." onkeyup="filterPlayers()" />
+
+  <div id="playerGrid" class="player-grid">
+    <a class="player-card" href="/player-dashboard.html?player=john-striker">
+      <img src="https://via.placeholder.com/100" alt="Player 1">
+      <h4>John Striker</h4>
+      <p>Club: Alpha FC</p>
+      <p>Position: ST</p>
+    </a>
+    <a class="player-card" href="/player-dashboard.html?player=mike-midfield">
+      <img src="https://via.placeholder.com/100" alt="Player 2">
+      <h4>Mike Midfield</h4>
+      <p>Club: Beta FC</p>
+      <p>Position: MID</p>
+    </a>
+    <a class="player-card" href="/player-dashboard.html?player=dan-defender">
+      <img src="https://via.placeholder.com/100" alt="Player 3">
+      <h4>Dan Defender</h4>
+      <p>Club: Omega FC</p>
+      <p>Position: DEF</p>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="links">
+    <a href="/">Return to Home</a>
+  </div>
+  <p>&copy; 2025 Enejistats. All rights reserved.</p>
+</footer>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>
