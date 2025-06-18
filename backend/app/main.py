@@ -171,11 +171,6 @@ async def get_login(request: Request, access_token: str = Cookie(None)):
         return RedirectResponse(url="/dashboard", status_code=302)
     return templates.TemplateResponse("login.html", {"request": request})
 
-@app.get("/player", response_class=HTMLResponse)
-async def player_entry(request: Request):
-    """Serve the player entry page"""
-    return templates.TemplateResponse("player.html", {"request": request})
-
 @app.get("/player-dashboard", response_class=HTMLResponse)
 async def player_dashboard(request: Request):
     """Serve the player dashboard page with session check"""
