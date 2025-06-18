@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from typing import Optional, List
+from pydantic import BaseModel
 import json
 import bcrypt
 from pathlib import Path
@@ -55,6 +56,19 @@ else:
     players_collection = None
     contact_collection = None
     print("Warning: MONGO_URI not set. Using JSON file storage.")
+
+# Pydantic Models
+class Player(BaseModel):
+    player_id: str
+    first_name: str
+    middle_name: Optional[str] = ""
+    last_name: str
+    dob: str
+    nationality: str
+    preferred_position_category: str
+    preferred_position: str
+    club: str
+    photo_url: str
 
 # JWT Helper Functions
 def create_access_token(data: dict, expires_delta: timedelta = None):
@@ -212,7 +226,50 @@ async def submit_contact(
     
     return templates.TemplateResponse("contact.html", {"request": request, "success": True})
 
-@app.post("/register")
+@app.post("/register", response_model=Player)
+async def register_player(
+    player_id: str = Form(...),
+    first_name: str = Form(...),
+    middle_name: str = Form(""),
+    last_name: str = Form(...),
+    dob: str = Form(...),
+    nationality: str = Form(...),
+    preferred_position_category: str = Form(...),
+    preferred_position: str = Form(...),
+    club: str = Form(...),
+    photo_url: str = Form(...)
+):
+    """API endpoint for player registration with Pydantic validation"""
+    new_player = {
+        "player_id": player_id,
+        "first_name": first_name,
+        "middle_name": middle_name,
+        "last_name": last_name,
+        "dob": dob,
+        "nationality": nationality,
+        "preferred_position_category": preferred_position_category,
+        "preferred_position": preferred_position,
+        "club": club,
+        "photo_url": photo_url
+    }
+    
+    if players_collection:
+        try:
+            players_collection.insert_one(new_player.copy())
+        except Exception as e:
+            print(f"Failed to save player: {e}")
+            save_to_json(new_player)
+    else:
+        save_to_json(new_player)
+    
+    return new_player
+
+@app.post("/validate-player")
+async def validate(player: Player):
+    """Validate player data using Pydantic model"""
+    return {"message": "Player data is valid", "player": player.dict()}
+
+@app.post("/register-user")
 async def register_user(
     request: Request,
     userType: str = Form(...),
@@ -238,7 +295,7 @@ async def register_user(
     clubAssociation: Optional[str] = Form(None),
     club: Optional[str] = Form(None)
 ):
-    """Handle user registration"""
+    """Handle user registration through web form"""
     
     try:
         # Basic validation
