@@ -1,0 +1,30 @@
+.container {
+  max-width: 700px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.container h2 {
+  color: #004aad;
+  margin-bottom: 1rem;
+}
+.btn-group {
+  margin-top: 2rem;
+}
+.btn-group a {
+  display: inline-block;
+  margin: 0.5rem 1rem;
+  padding: 0.7rem 1.5rem;
+  background-color: #004aad;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+.btn-group a:hover {
+  background-color: #00337a;
+}
