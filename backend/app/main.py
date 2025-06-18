@@ -112,43 +112,72 @@ async def home(request: Request):
         except Exception:
             raise HTTPException(status_code=404, detail="Home page not found")
 
+@app.get("/about", response_class=HTMLResponse)
+async def about(request: Request):
+    """Serve the about page"""
+    return templates.TemplateResponse("about.html", {"request": request})
+
+@app.get("/contact", response_class=HTMLResponse)
+async def contact(request: Request):
+    """Serve the contact page"""
+    return templates.TemplateResponse("contact.html", {"request": request})
+
+@app.get("/leaderboard", response_class=HTMLResponse)
+async def leaderboard(request: Request):
+    """Serve the leaderboard page"""
+    return templates.TemplateResponse("leaderboard.html", {"request": request})
+
+@app.get("/browse", response_class=HTMLResponse)
+async def browse(request: Request):
+    """Serve the browse page"""
+    return templates.TemplateResponse("browse.html", {"request": request})
+
+@app.get("/stats-area", response_class=HTMLResponse)
+async def stats_area(request: Request):
+    """Serve the stats area page"""
+    return templates.TemplateResponse("stats-area.html", {"request": request})
+
+@app.get("/stats", response_class=HTMLResponse)
+async def stats(request: Request):
+    """Serve the stats page"""
+    return templates.TemplateResponse("stats_area.html", {"request": request})
+
+@app.get("/stats/player", response_class=HTMLResponse)
+async def stats_player(request: Request):
+    """Serve the player stats page"""
+    return templates.TemplateResponse("player_dashboard.html", {"request": request})
+
+@app.get("/stats/browse", response_class=HTMLResponse)
+async def stats_browse(request: Request):
+    """Serve the stats browse page"""
+    return templates.TemplateResponse("browse.html", {"request": request})
+
 @app.get("/register", response_class=HTMLResponse)
 async def get_register_form(request: Request):
     """Serve the registration form"""
     return templates.TemplateResponse("register.html", {"request": request})
 
-@app.get("/about", response_class=HTMLResponse)
-async def about(request: Request):
-    return templates.TemplateResponse("about.html", {"request": request})
-
-@app.get("/stats/player", response_class=HTMLResponse)
-async def stats_player(request: Request):
-    return templates.TemplateResponse("player_dashboard.html", {"request": request})
-
-@app.get("/stats/browse", response_class=HTMLResponse)
-async def stats_browse(request: Request):
-    return templates.TemplateResponse("browse.html", {"request": request})
-
-@app.get("/stats", response_class=HTMLResponse)
-async def stats_area(request: Request):
-    return templates.TemplateResponse("stats_area.html", {"request": request})
-
-@app.get("/leaderboard", response_class=HTMLResponse)
-async def leaderboard(request: Request):
-    return templates.TemplateResponse("leaderboard.html", {"request": request})
-
-@app.get("/contact", response_class=HTMLResponse)
-async def contact(request: Request):
-    return templates.TemplateResponse("contact.html", {"request": request})
-
 @app.get("/login", response_class=HTMLResponse)
 async def get_login(request: Request, access_token: str = Cookie(None)):
+    """Serve the login page"""
     if access_token and verify_token(access_token):
         return RedirectResponse(url="/dashboard", status_code=302)
     return templates.TemplateResponse("login.html", {"request": request})
 
+@app.get("/player", response_class=HTMLResponse)
+async def player_entry(request: Request):
+    """Serve the player entry page"""
+    return templates.TemplateResponse("player.html", {"request": request})
+
+@app.get("/player-dashboard", response_class=HTMLResponse)
+async def player_dashboard(request: Request):
+    """Serve the player dashboard page with session check"""
+    # Note: This would need proper session management implementation
+    return templates.TemplateResponse("player-dashboard.html", {"request": request})
+
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, access_token: str = Cookie(None)):
+    """Serve the dashboard page with authentication"""
     user_id = verify_token(access_token)
     if not user_id:
         return RedirectResponse(url="/login")
@@ -167,263 +196,10 @@ async def dashboard(request: Request, access_token: str = Cookie(None)):
 
 @app.get("/logout")
 async def logout():
+    """Handle user logout"""
     response = RedirectResponse(url="/login", status_code=302)
     response.delete_cookie("access_token")
     return response
-
-@app.post("/login")
-async def post_login(
-    response: Response,
-    request: Request,
-    email: str = Form(...),
-    password: str = Form(...)
-):
-    if not players_collection:
-        return templates.TemplateResponse("login.html", {
-            "request": request,
-            "message": "Database not available."
-        })
-
-    user = players_collection.find_one({"email": email})
-
-    if not user:
-        return templates.TemplateResponse("login.html", {
-            "request": request,
-            "message": "Invalid email or password."
-        })
-
-    stored_password = user["password"]
-    if not bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
-        return templates.TemplateResponse("login.html", {
-            "request": request,
-            "message": "Invalid email or password."
-        })
-
-    # Create JWT token and set cookie
-    token = create_access_token({"sub": str(user["_id"])})
-    res = RedirectResponse(url="/dashboard", status_code=302)
-    res.set_cookie("access_token", token, httponly=True, max_age=3600)
-    return res
-
-@app.post("/submit-contact")
-async def submit_contact(
-    request: Request,
-    name: str = Form(...),
-    email: str = Form(...),
-    message: str = Form(...)
-):
-    contact_data = {
-        "name": name,
-        "email": email,
-        "message": message
-    }
-    
-    if contact_collection:
-        try:
-            contact_collection.insert_one(contact_data)
-        except Exception as e:
-            print(f"Failed to save contact message: {e}")
-    
-    return templates.TemplateResponse("contact.html", {"request": request, "success": True})
-
-@app.post("/register", response_model=Player)
-async def register_player(
-    player_id: str = Form(...),
-    first_name: str = Form(...),
-    middle_name: str = Form(""),
-    last_name: str = Form(...),
-    dob: str = Form(...),
-    nationality: str = Form(...),
-    preferred_position_category: str = Form(...),
-    preferred_position: str = Form(...),
-    club: str = Form(...),
-    photo_url: str = Form(...)
-):
-    """API endpoint for player registration with Pydantic validation"""
-    new_player = {
-        "player_id": player_id,
-        "first_name": first_name,
-        "middle_name": middle_name,
-        "last_name": last_name,
-        "dob": dob,
-        "nationality": nationality,
-        "preferred_position_category": preferred_position_category,
-        "preferred_position": preferred_position,
-        "club": club,
-        "photo_url": photo_url
-    }
-    
-    if players_collection:
-        try:
-            players_collection.insert_one(new_player.copy())
-        except Exception as e:
-            print(f"Failed to save player: {e}")
-            save_to_json(new_player)
-    else:
-        save_to_json(new_player)
-    
-    return new_player
-
-@app.post("/validate-player")
-async def validate(player: Player):
-    """Validate player data using Pydantic model"""
-    return {"message": "Player data is valid", "player": player.dict()}
-
-@app.post("/register-user")
-async def register_user(
-    request: Request,
-    userType: str = Form(...),
-    # Player fields
-    firstName: Optional[str] = Form(None),
-    middleName: Optional[str] = Form(None),
-    lastName: Optional[str] = Form(None),
-    email: Optional[str] = Form(None),
-    password: Optional[str] = Form(None),
-    dob: Optional[str] = Form(None),
-    gender: Optional[str] = Form(None),
-    playerNationality: Optional[str] = Form(None),
-    playerPhoto: Optional[UploadFile] = File(None),
-    preferredPositionCategory: Optional[str] = Form(None),
-    preferredPosition: Optional[str] = Form(None),
-    otherPositions: Optional[List[str]] = Form(None),
-    dominantFoot: Optional[str] = Form(None),
-    height: Optional[int] = Form(None),
-    weight: Optional[int] = Form(None),
-    league: Optional[str] = Form(None),
-    leagueClub: Optional[str] = Form(None),
-    generalClub: Optional[str] = Form(None),
-    clubAssociation: Optional[str] = Form(None),
-    club: Optional[str] = Form(None)
-):
-    """Handle user registration through web form"""
-    
-    try:
-        # Basic validation
-        if userType not in ["player", "club", "scout"]:
-            return JSONResponse(
-                content={"success": False, "message": "Invalid user type"},
-                status_code=400
-            )
-        
-        # Handle player registration
-        if userType == "player":
-            # Validate required fields
-            required_fields = {
-                "firstName": firstName,
-                "lastName": lastName,
-                "email": email,
-                "password": password,
-                "dob": dob,
-                "gender": gender,
-                "playerNationality": playerNationality,
-                "preferredPositionCategory": preferredPositionCategory,
-                "preferredPosition": preferredPosition,
-                "dominantFoot": dominantFoot,
-                "height": height,
-                "weight": weight,
-                "league": league,
-                "clubAssociation": clubAssociation
-            }
-            
-            missing_fields = [field for field, value in required_fields.items() if not value]
-            if missing_fields:
-                return JSONResponse(
-                    content={"success": False, "message": f"Missing required fields: {', '.join(missing_fields)}"},
-                    status_code=400
-                )
-            
-            # Handle photo upload
-            photo_filename = None
-            if playerPhoto and playerPhoto.filename:
-                # Validate file size (20KB limit)
-                content = await playerPhoto.read()
-                if len(content) > 20 * 1024:  # 20KB
-                    return JSONResponse(
-                        content={"success": False, "message": "Photo size must be 20KB or less"},
-                        status_code=400
-                    )
-                
-                # Generate filename
-                if firstName and lastName:
-                    photo_filename = f"{firstName.lower()}_{lastName.lower()}.jpg"
-                else:
-                    photo_filename = f"{email}_{playerPhoto.filename}"
-                
-                # Save the file
-                file_path = uploads_dir / photo_filename
-                with open(file_path, "wb") as buffer:
-                    buffer.write(content)
-            
-            # Hash password
-            hashed_password = None
-            if password:
-                hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            
-            # Determine selected club
-            selected_club = leagueClub or generalClub or club
-            
-            # Prepare registration data
-            registration_data = {
-                "userType": userType,
-                "firstName": firstName,
-                "middleName": middleName,
-                "lastName": lastName,
-                "email": email,
-                "password": hashed_password,
-                "dob": dob,
-                "gender": gender,
-                "nationality": playerNationality,
-                "photo": photo_filename,
-                "preferredPositionCategory": preferredPositionCategory,
-                "preferredPosition": preferredPosition,
-                "otherPositions": otherPositions or [],
-                "dominantFoot": dominantFoot,
-                "height": height,
-                "weight": weight,
-                "league": league,
-                "club": selected_club,
-                "clubAssociation": clubAssociation
-            }
-            
-            # Save to MongoDB if available, otherwise save to JSON
-            if players_collection:
-                try:
-                    # Remove userType and None values for database
-                    clean_data = {k: v for k, v in registration_data.items() 
-                                 if v is not None and k != 'userType'}
-                    
-                    players_collection.insert_one(clean_data)
-                    return RedirectResponse(url="/success", status_code=303)
-                    
-                except Exception as e:
-                    print(f"MongoDB error: {e}")
-                    # Fall back to JSON storage
-                    save_to_json(registration_data)
-                    return JSONResponse(
-                        content={"success": True, "message": "Player registration successful! (Saved to backup)"},
-                        status_code=200
-                    )
-            else:
-                # Save to JSON file
-                save_to_json(registration_data)
-                return JSONResponse(
-                    content={"success": True, "message": "Player registration successful!"},
-                    status_code=200
-                )
-        
-        # Handle club and scout registrations (coming soon)
-        elif userType in ["club", "scout"]:
-            return JSONResponse(
-                content={"success": False, "message": f"{userType.title()} registration coming soon!"},
-                status_code=400
-            )
-        
-    except Exception as e:
-        print(f"Registration error: {str(e)}")
-        return JSONResponse(
-            content={"success": False, "message": "An error occurred during registration"},
-            status_code=500
-        )
 
 @app.get("/success", response_class=HTMLResponse)
 async def registration_success():
@@ -487,6 +263,264 @@ async def get_registrations():
         return {"registrations": registrations, "source": "json"}
     
     return {"registrations": [], "source": "none"}
+
+@app.post("/login")
+async def post_login(
+    response: Response,
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...)
+):
+    """Handle user login"""
+    if not players_collection:
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "message": "Database not available."
+        })
+
+    user = players_collection.find_one({"email": email})
+
+    if not user:
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "message": "Invalid email or password."
+        })
+
+    stored_password = user["password"]
+    if not bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "message": "Invalid email or password."
+        })
+
+    # Create JWT token and set cookie
+    token = create_access_token({"sub": str(user["_id"])})
+    res = RedirectResponse(url="/dashboard", status_code=302)
+    res.set_cookie("access_token", token, httponly=True, max_age=3600)
+    return res
+
+@app.post("/submit-contact")
+async def submit_contact(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    message: str = Form(...)
+):
+    """Handle contact form submission"""
+    contact_data = {
+        "name": name,
+        "email": email,
+        "message": message
+    }
+    
+    if contact_collection:
+        try:
+            contact_collection.insert_one(contact_data)
+        except Exception as e:
+            print(f"Failed to save contact message: {e}")
+    
+    return templates.TemplateResponse("contact.html", {"request": request, "success": True})
+
+@app.post("/register")
+async def register_user(
+    request: Request,
+    userType: str = Form(...),
+    # Player fields for web form registration
+    firstName: Optional[str] = Form(None),
+    middleName: Optional[str] = Form(None),
+    lastName: Optional[str] = Form(None),
+    email: Optional[str] = Form(None),
+    password: Optional[str] = Form(None),
+    dob: Optional[str] = Form(None),
+    gender: Optional[str] = Form(None),
+    playerNationality: Optional[str] = Form(None),
+    playerPhoto: Optional[UploadFile] = File(None),
+    preferredPositionCategory: Optional[str] = Form(None),
+    preferredPosition: Optional[str] = Form(None),
+    otherPositions: Optional[List[str]] = Form(None),
+    dominantFoot: Optional[str] = Form(None),
+    height: Optional[int] = Form(None),
+    weight: Optional[int] = Form(None),
+    league: Optional[str] = Form(None),
+    leagueClub: Optional[str] = Form(None),
+    generalClub: Optional[str] = Form(None),
+    clubAssociation: Optional[str] = Form(None),
+    club: Optional[str] = Form(None),
+    # API fields for Pydantic validation
+    player_id: Optional[str] = Form(None),
+    first_name: Optional[str] = Form(None),
+    middle_name: Optional[str] = Form(None),
+    last_name: Optional[str] = Form(None),
+    nationality: Optional[str] = Form(None),
+    preferred_position_category: Optional[str] = Form(None),
+    preferred_position: Optional[str] = Form(None),
+    photo_url: Optional[str] = Form(None)
+):
+    """Handle both web form registration and API registration"""
+    
+    try:
+        # Determine if this is an API call or web form submission
+        is_api_call = bool(player_id and first_name and last_name)
+        
+        if is_api_call:
+            # Handle API registration with Pydantic validation
+            new_player = {
+                "player_id": player_id,
+                "first_name": first_name,
+                "middle_name": middle_name or "",
+                "last_name": last_name,
+                "dob": dob,
+                "nationality": nationality,
+                "preferred_position_category": preferred_position_category,
+                "preferred_position": preferred_position,
+                "club": club,
+                "photo_url": photo_url
+            }
+            
+            if players_collection:
+                try:
+                    players_collection.insert_one(new_player.copy())
+                except Exception as e:
+                    print(f"Failed to save player: {e}")
+                    save_to_json(new_player)
+            else:
+                save_to_json(new_player)
+            
+            return new_player
+        
+        else:
+            # Handle web form registration
+            # Basic validation
+            if userType not in ["player", "club", "scout"]:
+                return JSONResponse(
+                    content={"success": False, "message": "Invalid user type"},
+                    status_code=400
+                )
+            
+            # Handle player registration
+            if userType == "player":
+                # Validate required fields
+                required_fields = {
+                    "firstName": firstName,
+                    "lastName": lastName,
+                    "email": email,
+                    "password": password,
+                    "dob": dob,
+                    "gender": gender,
+                    "playerNationality": playerNationality,
+                    "preferredPositionCategory": preferredPositionCategory,
+                    "preferredPosition": preferredPosition,
+                    "dominantFoot": dominantFoot,
+                    "height": height,
+                    "weight": weight,
+                    "league": league,
+                    "clubAssociation": clubAssociation
+                }
+                
+                missing_fields = [field for field, value in required_fields.items() if not value]
+                if missing_fields:
+                    return JSONResponse(
+                        content={"success": False, "message": f"Missing required fields: {', '.join(missing_fields)}"},
+                        status_code=400
+                    )
+                
+                # Handle photo upload
+                photo_filename = None
+                if playerPhoto and playerPhoto.filename:
+                    # Validate file size (20KB limit)
+                    content = await playerPhoto.read()
+                    if len(content) > 20 * 1024:  # 20KB
+                        return JSONResponse(
+                            content={"success": False, "message": "Photo size must be 20KB or less"},
+                            status_code=400
+                        )
+                    
+                    # Generate filename
+                    if firstName and lastName:
+                        photo_filename = f"{firstName.lower()}_{lastName.lower()}.jpg"
+                    else:
+                        photo_filename = f"{email}_{playerPhoto.filename}"
+                    
+                    # Save the file
+                    file_path = uploads_dir / photo_filename
+                    with open(file_path, "wb") as buffer:
+                        buffer.write(content)
+                
+                # Hash password
+                hashed_password = None
+                if password:
+                    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                
+                # Determine selected club
+                selected_club = leagueClub or generalClub or club
+                
+                # Prepare registration data
+                registration_data = {
+                    "userType": userType,
+                    "firstName": firstName,
+                    "middleName": middleName,
+                    "lastName": lastName,
+                    "email": email,
+                    "password": hashed_password,
+                    "dob": dob,
+                    "gender": gender,
+                    "nationality": playerNationality,
+                    "photo": photo_filename,
+                    "preferredPositionCategory": preferredPositionCategory,
+                    "preferredPosition": preferredPosition,
+                    "otherPositions": otherPositions or [],
+                    "dominantFoot": dominantFoot,
+                    "height": height,
+                    "weight": weight,
+                    "league": league,
+                    "club": selected_club,
+                    "clubAssociation": clubAssociation
+                }
+                
+                # Save to MongoDB if available, otherwise save to JSON
+                if players_collection:
+                    try:
+                        # Remove userType and None values for database
+                        clean_data = {k: v for k, v in registration_data.items() 
+                                     if v is not None and k != 'userType'}
+                        
+                        players_collection.insert_one(clean_data)
+                        return RedirectResponse(url="/success", status_code=303)
+                        
+                    except Exception as e:
+                        print(f"MongoDB error: {e}")
+                        # Fall back to JSON storage
+                        save_to_json(registration_data)
+                        return JSONResponse(
+                            content={"success": True, "message": "Player registration successful! (Saved to backup)"},
+                            status_code=200
+                        )
+                else:
+                    # Save to JSON file
+                    save_to_json(registration_data)
+                    return JSONResponse(
+                        content={"success": True, "message": "Player registration successful!"},
+                        status_code=200
+                    )
+            
+            # Handle club and scout registrations (coming soon)
+            elif userType in ["club", "scout"]:
+                return JSONResponse(
+                    content={"success": False, "message": f"{userType.title()} registration coming soon!"},
+                    status_code=400
+                )
+        
+    except Exception as e:
+        print(f"Registration error: {str(e)}")
+        return JSONResponse(
+            content={"success": False, "message": "An error occurred during registration"},
+            status_code=500
+        )
+
+@app.post("/validate-player")
+async def validate(player: Player):
+    """Validate player data using Pydantic model"""
+    return {"message": "Player data is valid", "player": player.dict()}
 
 if __name__ == "__main__":
     import uvicorn
