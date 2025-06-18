@@ -143,7 +143,7 @@ async def stats(request: Request):
     return templates.TemplateResponse("stats_area.html", {"request": request})
 
 @app.get("/player", response_class=HTMLResponse)
-async def stats_player(request: Request):
+async def player(request: Request):
     """Serve the player page"""
     return templates.TemplateResponse("player.html", {"request": request})
 
