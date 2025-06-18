@@ -150,7 +150,7 @@ async def player(request: Request):
 @app.get("/stats/player", response_class=HTMLResponse)
 async def stats_player(request: Request):
     """Serve the player stats page"""
-    return templates.TemplateResponse("player_dashboard.html", {"request": request})
+    return templates.TemplateResponse("player.html", {"request": request})
 
 @app.get("/stats/browse", response_class=HTMLResponse)
 async def stats_browse(request: Request):
