@@ -4,53 +4,33 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Stats Area | Enejistats</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
-  <style>
-    .tabs {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 2rem 0;
-    }
-    .tabs button {
-      padding: 0.7rem 1.5rem;
-      background-color: #004aad;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .tabs button:hover {
-      background-color: #00337a;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/stats-area.css') }}">
 </head>
 <body>
 
 <header>
   <h1>Enejistats</h1>
   <nav>
-    <a href="/index.html">Home</a>
-    <a href="/about.html">About</a>
+    <a href="/index">Home</a>
+    <a href="/about">About</a>
 
     <div class="dropdown">
       <span class="dropbtn">Stats Area ▾</span>
       <div class="dropdown-content">
-        <a href="/player.html">Player</a>
-        <a href="/browse.html">Browse</a>
+        <a href="/player">Player</a>
+        <a href="/browse">Browse</a>
       </div>
     </div>
 
-    <a href="/leaderboard.html">Leaderboard</a>
-    <a href="/contact.html">Contact</a>
-    <a href="/register.html">Register / Sign In</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/contact">Contact</a>
+    <a href="/register">Register / Sign In</a>
   </nav>
 </header>
 
 <section class="tabs">
   <button onclick="handlePlayerClick()">Player</button>
-  <button onclick="window.location.href='/browse.html'">Browse</button>
+  <button onclick="window.location.href='/browse'">Browse</button>
 </section>
 
 <section class="content-area">
@@ -59,23 +39,11 @@
 
 <footer>
   <div class="links">
-    <a href="/index.html">Return to Home</a>
+    <a href="/index">Return to Home</a>
   </div>
   <p>&copy; <span id="year"></span> Enejistats. All rights reserved.</p>
 </footer>
 
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-
-  function handlePlayerClick() {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      window.location.href = "/player-dashboard.html";
-    } else {
-      window.location.href = "/login.html";
-    }
-  }
-</script>
-
+<script src="{{ url_for('static', path='/js/stats-area.js') }}"></script>
 </body>
 </html>
