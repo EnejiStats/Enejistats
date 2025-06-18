@@ -10,6 +10,7 @@ import bcrypt
 from pathlib import Path
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from bson.objectid import ObjectId
 
 # Load environment variables
 load_dotenv()
@@ -33,50 +34,53 @@ if MONGO_URI:
         client = MongoClient(MONGO_URI)
         db = client["enejistats"]
         players_collection = db["players"]
+        contact_collection = db["contact_messages"]
         print("Connected to MongoDB")
     except Exception as e:
         print(f"MongoDB connection failed: {e}")
         client = None
         db = None
         players_collection = None
+        contact_collection = None
 else:
     client = None
     db = None
     players_collection = None
+    contact_collection = None
     print("Warning: MONGO_URI not set. Using JSON file storage.")
 
 # Helper function to save to JSON (fallback when MongoDB is not available)
-def save_to_json(data):
-    registrations_file = Path("registrations.json")
-    if registrations_file.exists():
-        with open(registrations_file, "r") as f:
-            registrations = json.load(f)
+def save_to_json(data, filename="registrations.json"):
+    file_path = Path(filename)
+    if file_path.exists():
+        with open(file_path, "r") as f:
+            records = json.load(f)
     else:
-        registrations = []
+        records = []
     
-    registrations.append(data)
+    records.append(data)
     
-    with open(registrations_file, "w") as f:
-        json.dump(registrations, f, indent=2)
+    with open(file_path, "w") as f:
+        json.dump(records, f, indent=2)
 
+# MAIN ROUTES
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """Serve the registration form as home page"""
+    """Serve the home page"""
     try:
-        return templates.TemplateResponse("register.html", {"request": request})
+        return templates.TemplateResponse("index.html", {"request": request})
     except Exception:
-        # Fallback if templates don't work
+        # Fallback to register if index doesn't exist
         try:
-            with open("register.html", "r") as f:
-                html_content = f.read()
-            return HTMLResponse(content=html_content)
+            return templates.TemplateResponse("register.html", {"request": request})
         except Exception:
-            raise HTTPException(status_code=404, detail="Registration page not found")
-
-@app.get("/register", response_class=HTMLResponse)
-async def get_register_form(request: Request):
-    """Serve the registration form"""
-    return await home(request)
+            # Final fallback if templates don't work
+            try:
+                with open("register.html", "r") as f:
+                    html_content = f.read()
+                return HTMLResponse(content=html_content)
+            except Exception:
+                raise HTTPException(status_code=404, detail="Home page not found")
 
 @app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
@@ -90,6 +94,10 @@ async def stats_player(request: Request):
 async def stats_browse(request: Request):
     return templates.TemplateResponse("browse.html", {"request": request})
 
+@app.get("/stats", response_class=HTMLResponse)
+async def stats_area(request: Request):
+    return templates.TemplateResponse("stats_area.html", {"request": request})
+
 @app.get("/leaderboard", response_class=HTMLResponse)
 async def leaderboard(request: Request):
     return templates.TemplateResponse("leaderboard.html", {"request": request})
@@ -98,10 +106,16 @@ async def leaderboard(request: Request):
 async def contact(request: Request):
     return templates.TemplateResponse("contact.html", {"request": request})
 
+@app.get("/register", response_class=HTMLResponse)
+async def get_register_form(request: Request):
+    """Serve the registration form"""
+    return templates.TemplateResponse("register.html", {"request": request})
+
 @app.get("/login", response_class=HTMLResponse)
 async def get_login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
+# AUTHENTICATION ROUTES
 @app.post("/login")
 async def post_login(
     request: Request,
@@ -136,6 +150,7 @@ async def post_login(
         "message": "Login successful!"
     })
 
+# REGISTRATION ROUTE
 @app.post("/register")
 async def register_user(
     request: Request,
@@ -198,6 +213,15 @@ async def register_user(
                     content={"success": False, "message": f"Missing required fields: {', '.join(missing_fields)}"},
                     status_code=400
                 )
+            
+            # Check if email already exists
+            if players_collection:
+                existing_user = players_collection.find_one({"email": email})
+                if existing_user:
+                    return JSONResponse(
+                        content={"success": False, "message": "Email already registered"},
+                        status_code=400
+                    )
             
             # Handle photo upload
             photo_filename = None
@@ -292,6 +316,34 @@ async def register_user(
             status_code=500
         )
 
+# CONTACT ROUTE
+@app.post("/submit-contact")
+async def submit_contact(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    message: str = Form(...)
+):
+    contact_data = {
+        "name": name,
+        "email": email,
+        "message": message
+    }
+    
+    if contact_collection:
+        try:
+            contact_collection.insert_one(contact_data)
+        except Exception as e:
+            print(f"MongoDB contact error: {e}")
+            # Fall back to JSON storage
+            save_to_json(contact_data, "contact_messages.json")
+    else:
+        # Save to JSON file
+        save_to_json(contact_data, "contact_messages.json")
+    
+    return templates.TemplateResponse("contact.html", {"request": request, "success": True})
+
+# SUCCESS PAGE
 @app.get("/success", response_class=HTMLResponse)
 async def registration_success():
     """Show registration success page"""
@@ -336,7 +388,8 @@ async def registration_success():
     </html>
     """)
 
-@app.get("/registrations")
+# API ENDPOINTS FOR DATA RETRIEVAL
+@app.get("/api/registrations")
 async def get_registrations():
     """Get all registrations (for testing purposes)"""
     if players_collection:
@@ -354,6 +407,25 @@ async def get_registrations():
         return {"registrations": registrations, "source": "json"}
     
     return {"registrations": [], "source": "none"}
+
+@app.get("/api/contacts")
+async def get_contacts():
+    """Get all contact messages (for admin purposes)"""
+    if contact_collection:
+        try:
+            contacts = list(contact_collection.find({}, {"_id": 0}))
+            return {"contacts": contacts, "source": "mongodb"}
+        except Exception as e:
+            print(f"MongoDB query error: {e}")
+    
+    # Fallback to JSON file
+    contacts_file = Path("contact_messages.json")
+    if contacts_file.exists():
+        with open(contacts_file, "r") as f:
+            contacts = json.load(f)
+        return {"contacts": contacts, "source": "json"}
+    
+    return {"contacts": [], "source": "none"}
 
 if __name__ == "__main__":
     import uvicorn
