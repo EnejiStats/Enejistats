@@ -1,303 +1,284 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Enejistats | New User Registration</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
-
-<!-- ✅ Header -->
-<header>
-  <h1>Enejistats</h1>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/about">About</a>
-    <div class="dropdown">
-      <span class="dropbtn">Stats Area ▾</span>
-      <div class="dropdown-content">
-        <a href="/stats/player">Player</a>
-        <a href="/stats/browse">Browse</a>
-      </div>
-    </div>
-    <a href="/leaderboard">Leaderboard</a>
-    <a href="/contact">Contact</a>
-    <a href="/register">Register / Sign In</a>
-  </nav>
-</header>
-<main>
-  <h2>User Registration</h2>
-  <form id="registrationForm" action="/register" method="post" enctype="multipart/form-data">
-    <label for="userType">User Type</label>
-    <select id="userType" name="userType" onchange="displayFields()" required>
-      <option value="">-- Select User Type --</option>
-      <option value="player">Player</option>
-      <option value="club">Club</option>
-      <option value="scout">Scout / Agent</option>
-    </select>
-
-    <!-- Player Fields -->
-    <fieldset id="playerFields" class="user-fields hidden">
-      <legend>Player Details</legend>
-      
-      <label for="firstName">First Name</label>
-      <input type="text" id="firstName" name="firstName" required />
-      
-      <label for="middleName">Middle Name (Optional)</label>
-      <input type="text" id="middleName" name="middleName" />
-      
-      <label for="lastName">Last Name</label>
-      <input type="text" id="lastName" name="lastName" required />
-      
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" required />
-
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required />
-      
-      <label for="dob">Date of Birth</label>
-      <input type="date" id="dob" name="dob" required />
-      
-      <label for="gender">Gender</label>
-      <select id="gender" name="gender" required>
-        <option value="">Select</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
-      </select>
-      
-      <label for="playerNationality">Nationality</label>
-      <select id="playerNationality" name="playerNationality" required>
-        <option value="">Select Country</option>
-      </select>
-      
-      <label for="playerPhoto">Passport Photo (Max 20KB)</label>
-      <input type="file" id="playerPhoto" name="playerPhoto" accept="image/*" required />
-      
-      <label for="preferredPositionCategory">Preferred Position</label>
-      <select id="preferredPositionCategory" name="preferredPositionCategory" onchange="showPreferredPositions()" required>
-        <option value="">Select Position Category</option>
-        <option value="goalkeeper">Goalkeeper</option>
-        <option value="defender">Defender</option>
-        <option value="midfielder">Midfielder</option>
-        <option value="attacker">Attacker</option>
-      </select>
-      
-      <div id="preferredPositionOptions" class="hidden">
-        <label for="preferredPosition">Specific Position</label>
-        <select id="preferredPosition" name="preferredPosition" required>
-          <option value="">Select Position</option>
-        </select>
-      </div>
-      
-      <label for="otherPositionsDropdown">Other Positions (Optional - Multiple Selection)</label>
-      <div class="other-positions-dropdown">
-        <div class="other-positions-trigger" onclick="toggleOtherPositionsDropdown()">
-          <span id="otherPositionsDisplay">Click to select positions</span>
-          <span class="dropdown-arrow" id="dropdownArrow">▼</span>
-        </div>
-        <div id="otherPositionsPanel" class="other-positions-panel hidden">
-          <div class="positions-grid">
-            <div class="position-category-grid">
-              <div class="category-title">Goalkeeper</div>
-              <div class="positions-row">
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="GK" id="other-gk" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-gk">GK - Goalkeeper</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="SWK" id="other-swk" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-swk">SWK - Sweeper Keeper</label>
-                </div>
-              </div>
-            </div>
-            
-            <div class="position-category-grid">
-              <div class="category-title">Defender</div>
-              <div class="positions-row">
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="CB" id="other-cb" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-cb">CB - Centre Back</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="RCB" id="other-rcb" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-rcb">RCB - Right Centre Back</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="LCB" id="other-lcb" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-lcb">LCB - Left Centre Back</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="LB" id="other-lb" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-lb">LB - Left Back</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="RB" id="other-rb" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-rb">RB - Right Back</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="LWB" id="other-lwb" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-lwb">LWB - Left Wing Back</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="RWB" id="other-rwb" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-rwb">RWB - Right Wing Back</label>
-                </div>
-              </div>
-            </div>
-            
-            <div class="position-category-grid">
-              <div class="category-title">Midfielder</div>
-              <div class="positions-row">
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="CDM" id="other-cdm" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-cdm">CDM - Central Defensive Midfielder</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="CM" id="other-cm" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-cm">CM - Central Midfielder</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="CAM" id="other-cam" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-cam">CAM - Central Attacking Midfielder</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="RM" id="other-rm" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-rm">RM - Right Midfielder</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="LM" id="other-lm" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-lm">LM - Left Midfielder</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="RW" id="other-rw" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-rw">RW - Right Winger</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="LW" id="other-lw" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-lw">LW - Left Winger</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="DM" id="other-dm" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-dm">DM - Defensive Midfielder</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="AM" id="other-am" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-am">AM - Attacking Midfielder</label>
-                </div>
-              </div>
-            </div>
-            
-            <div class="position-category-grid">
-              <div class="category-title">Attacker</div>
-              <div class="positions-row">
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="ST" id="other-st" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-st">ST - Striker</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="CF" id="other-cf" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-cf">CF - Centre Forward</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="LF" id="other-lf" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-lf">LF - Left Forward</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="RF" id="other-rf" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-rf">RF - Right Forward</label>
-                </div>
-                <div class="position-checkbox">
-                  <input type="checkbox" name="otherPositions" value="SS" id="other-ss" onchange="updateOtherPositionsDisplay()">
-                  <label for="other-ss">SS - Second Striker</label>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <label for="dominantFoot">Dominant Foot</label>
-      <select id="dominantFoot" name="dominantFoot" required>
-        <option value="">Select</option>
-        <option value="left">Left</option>
-        <option value="right">Right</option>
-        <option value="both">Both</option>
-      </select>
-      
-      <label for="height">Height (cm)</label>
-      <input type="number" id="height" name="height" required />
-      
-      <label for="weight">Weight (kg)</label>
-      <input type="number" id="weight" name="weight" required />
-      
-      <label for="league">League</label>
-      <select id="league" name="league" onchange="handleLeagueChange()" required>
-        <option value="">Select League</option>
-        <option value="npfl">Nigerian Professional Football League</option>
-        <option value="nnl1">Nigerian National League One</option>
-        <option value="nnl2">Nigerian National League Two</option>
-        <option value="academy">Academy</option>
-        <option value="*****">***** Clubs</option>
-        <option value="university">University</option>
-      </select>
-      
-      <div id="leagueClubDropdown" class="hidden">
-        <label for="leagueClub">Select Club/Team</label>
-        <select id="leagueClub" name="leagueClub" required>
-          <option value="">Select Club/Team</option>
-        </select>
-      </div>
-      
-      <div id="generalClubDropdown" class="hidden">
-        <label for="generalClub">Select Club/Team</label>
-        <select id="generalClub" name="generalClub" required>
-          <option value="">Select Club/Team</option>
-        </select>
-      </div>
-      
-      <label for="clubAssociation">Club Association</label>
-      <select id="clubAssociation" name="clubAssociation" onchange="toggleClubDropdown()" required>
-        <option value="no">No</option>
-        <option value="yes">Yes</option>
-      </select>
-      
-      <div id="clubDropdown" class="hidden">
-        <label for="club">Select Club</label>
-        <select id="club" name="club" required>
-          <option value="">Select Club</option>
-        </select>
-      </div>
-    </fieldset>
-
-    <!-- Club Fields -->
-    <fieldset id="clubFields" class="user-fields hidden">
-      <legend>Club Registration</legend>
-      <div class="coming-soon">Coming Soon</div>
-    </fieldset>
-
-    <!-- Scout Fields -->
-    <fieldset id="scoutFields" class="user-fields hidden">
-      <legend>Scout/Agent Registration</legend>
-      <div class="coming-soon">Coming Soon</div>
-    </fieldset>
-
-    <button type="submit">Register</button>
-  </form>
-</main>
-<!-- ✅ Footer -->
-<footer>
-  <div class="links">
-    <a href="/">Home</a>
-    <a href="/about">About</a>
-    <a href="/stats">Stats Area</a>
-    <a href="/leaderboard">Leaderboard</a>
-    <a href="/contact">Contact</a>
-    <a href="/register">Register</a>
-  </div>
-  <p>&copy; <span id="year"></span> Enejistats. All rights reserved.</p>
-</footer>
-<script src="{{ url_for('static', path='/js/register.js') }}"></script>
-</body>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8" />  
+  <title>Register | Enejistats</title>  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/register.css') }}">  
+</head>  
+<body>  
+<header>  
+  <h1>Enejistats</h1>  
+  <nav>  
+    <a href="index.html">Home</a>  
+    <a href="leaderboard.html">Leaderboard</a>  
+    <a href="register.html">Register</a>  
+    <a href="browse.html">Browse</a>  
+  </nav>  
+</header>  
+<main>  
+  <h2>User Registration</h2>  
+  <form id="registrationForm" action="/register" method="post" enctype="multipart/form-data">  
+    <label for="userType">User Type</label>  
+    <select id="userType" name="userType" onchange="displayFields()" required>  
+      <option value="">-- Select User Type --</option>  
+      <option value="player">Player</option>  
+      <option value="club">Club</option>  
+      <option value="scout">Scout / Agent</option>  
+    </select>  
+  
+    <!-- Player Fields -->  
+    <fieldset id="playerFields" class="user-fields hidden">  
+      <legend>Player Details</legend>  
+        
+      <label for="firstName">First Name</label>  
+      <input type="text" id="firstName" name="firstName" required />  
+        
+      <label for="middleName">Middle Name (Optional)</label>  
+      <input type="text" id="middleName" name="middleName" />  
+        
+      <label for="lastName">Last Name</label>  
+      <input type="text" id="lastName" name="lastName" required />  
+        
+      <label for="email">Email Address</label>  
+      <input type="email" id="email" name="email" required />  
+  
+      <label for="password">Password</label>  
+      <input type="password" id="password" name="password" required />  
+        
+      <label for="dob">Date of Birth</label>  
+      <input type="date" id="dob" name="dob" required />  
+        
+      <label for="gender">Gender</label>  
+      <select id="gender" name="gender" required>  
+        <option value="">Select</option>  
+        <option value="male">Male</option>  
+        <option value="female">Female</option>  
+        <option value="other">Other</option>  
+      </select>  
+        
+      <label for="playerNationality">Nationality</label>  
+      <select id="playerNationality" name="playerNationality" required>  
+        <option value="">Select Country</option>  
+      </select>  
+        
+      <label for="playerPhoto">Passport Photo (Max 20KB)</label>  
+      <input type="file" id="playerPhoto" name="playerPhoto" accept="image/*" required />  
+        
+      <label for="preferredPositionCategory">Preferred Position</label>  
+      <select id="preferredPositionCategory" name="preferredPositionCategory" onchange="showPreferredPositions()" required>  
+        <option value="">Select Position Category</option>  
+        <option value="goalkeeper">Goalkeeper</option>  
+        <option value="defender">Defender</option>  
+        <option value="midfielder">Midfielder</option>  
+        <option value="attacker">Attacker</option>  
+      </select>  
+        
+      <div id="preferredPositionOptions" class="hidden">  
+        <label for="preferredPosition">Specific Position</label>  
+        <select id="preferredPosition" name="preferredPosition" required>  
+          <option value="">Select Position</option>  
+        </select>  
+      </div>  
+        
+      <label for="otherPositionsDropdown">Other Positions (Optional - Multiple Selection)</label>  
+      <div class="other-positions-dropdown">  
+        <div class="other-positions-trigger" onclick="toggleOtherPositionsDropdown()">  
+          <span id="otherPositionsDisplay">Click to select positions</span>  
+          <span class="dropdown-arrow" id="dropdownArrow">▼</span>  
+        </div>  
+        <div id="otherPositionsPanel" class="other-positions-panel hidden">  
+          <div class="positions-grid">  
+            <div class="position-category-grid">  
+              <div class="category-title">Goalkeeper</div>  
+              <div class="positions-row">  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="GK" id="other-gk" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-gk">GK - Goalkeeper</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="SWK" id="other-swk" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-swk">SWK - Sweeper Keeper</label>  
+                </div>  
+              </div>  
+            </div>  
+              
+            <div class="position-category-grid">  
+              <div class="category-title">Defender</div>  
+              <div class="positions-row">  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="CB" id="other-cb" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-cb">CB - Centre Back</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="RCB" id="other-rcb" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-rcb">RCB - Right Centre Back</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="LCB" id="other-lcb" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-lcb">LCB - Left Centre Back</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="LB" id="other-lb" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-lb">LB - Left Back</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="RB" id="other-rb" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-rb">RB - Right Back</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="LWB" id="other-lwb" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-lwb">LWB - Left Wing Back</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="RWB" id="other-rwb" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-rwb">RWB - Right Wing Back</label>  
+                </div>  
+              </div>  
+            </div>  
+              
+            <div class="position-category-grid">  
+              <div class="category-title">Midfielder</div>  
+              <div class="positions-row">  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="CDM" id="other-cdm" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-cdm">CDM - Central Defensive Midfielder</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="CM" id="other-cm" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-cm">CM - Central Midfielder</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="CAM" id="other-cam" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-cam">CAM - Central Attacking Midfielder</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="RM" id="other-rm" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-rm">RM - Right Midfielder</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="LM" id="other-lm" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-lm">LM - Left Midfielder</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="RW" id="other-rw" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-rw">RW - Right Winger</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="LW" id="other-lw" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-lw">LW - Left Winger</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="DM" id="other-dm" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-dm">DM - Defensive Midfielder</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="AM" id="other-am" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-am">AM - Attacking Midfielder</label>  
+                </div>  
+              </div>  
+            </div>  
+              
+            <div class="position-category-grid">  
+              <div class="category-title">Attacker</div>  
+              <div class="positions-row">  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="ST" id="other-st" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-st">ST - Striker</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="CF" id="other-cf" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-cf">CF - Centre Forward</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="LF" id="other-lf" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-lf">LF - Left Forward</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="RF" id="other-rf" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-rf">RF - Right Forward</label>  
+                </div>  
+                <div class="position-checkbox">  
+                  <input type="checkbox" name="otherPositions" value="SS" id="other-ss" onchange="updateOtherPositionsDisplay()">  
+                  <label for="other-ss">SS - Second Striker</label>  
+                </div>  
+              </div>  
+            </div>  
+          </div>  
+        </div>  
+      </div>  
+        
+      <label for="dominantFoot">Dominant Foot</label>  
+      <select id="dominantFoot" name="dominantFoot" required>  
+        <option value="">Select</option>  
+        <option value="left">Left</option>  
+        <option value="right">Right</option>  
+        <option value="both">Both</option>  
+      </select>  
+        
+      <label for="height">Height (cm)</label>  
+      <input type="number" id="height" name="height" required />  
+        
+      <label for="weight">Weight (kg)</label>  
+      <input type="number" id="weight" name="weight" required />  
+        
+      <label for="league">League</label>  
+      <select id="league" name="league" onchange="handleLeagueChange()" required>  
+        <option value="">Select League</option>  
+        <option value="npfl">Nigerian Professional Football League</option>  
+        <option value="nnl1">Nigerian National League One</option>  
+        <option value="nnl2">Nigerian National League Two</option>  
+        <option value="academy">Academy</option>  
+        <option value="*****">***** Clubs</option>  
+        <option value="university">University</option>  
+      </select>  
+        
+      <div id="leagueClubDropdown" class="hidden">  
+        <label for="leagueClub">Select Club/Team</label>  
+        <select id="leagueClub" name="leagueClub" required>  
+          <option value="">Select Club/Team</option>  
+        </select>  
+      </div>  
+        
+      <div id="generalClubDropdown" class="hidden">  
+        <label for="generalClub">Select Club/Team</label>  
+        <select id="generalClub" name="generalClub" required>  
+          <option value="">Select Club/Team</option>  
+        </select>  
+      </div>  
+        
+      <label for="clubAssociation">Club Association</label>  
+      <select id="clubAssociation" name="clubAssociation" onchange="toggleClubDropdown()" required>  
+        <option value="no">No</option>  
+        <option value="yes">Yes</option>  
+      </select>  
+        
+      <div id="clubDropdown" class="hidden">  
+        <label for="club">Select Club</label>  
+        <select id="club" name="club" required>  
+          <option value="">Select Club</option>  
+        </select>  
+      </div>  
+    </fieldset>  
+  
+    <!-- Club Fields -->  
+    <fieldset id="clubFields" class="user-fields hidden">  
+      <legend>Club Registration</legend>  
+      <div class="coming-soon">Coming Soon</div>  
+    </fieldset>  
+  
+    <!-- Scout Fields -->  
+    <fieldset id="scoutFields" class="user-fields hidden">  
+      <legend>Scout/Agent Registration</legend>  
+      <div class="coming-soon">Coming Soon</div>  
+    </fieldset>  
+  
+    <button type="submit">Register</button>  
+  </form>  
+</main>  
+<footer>  
+  <p>&copy; 2025 Enejistats</p>  
+</footer>  
+<script src="{{ url_for('static', path='/js/register.js') }}"></script>  
+</body>  
 </html>
