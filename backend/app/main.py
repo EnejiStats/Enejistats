@@ -142,7 +142,7 @@ async def stats(request: Request):
     """Serve the stats page"""
     return templates.TemplateResponse("stats_area.html", {"request": request})
 
-@app.get("/player", response_class=HTMLResponse)
+@app.get("/stats_player", response_class=HTMLResponse)
 async def browse(request: Request):
     """Serve the player page"""
     return templates.TemplateResponse("player.html", {"request": request})
