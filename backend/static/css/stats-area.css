@@ -1,70 +1,11 @@
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f4f4f4;
-  color: #333;
-}
-
-header {
-  background-color: #004aad;
-  padding: 1rem;
-  color: white;
+.tabs {
+  margin-top: 2rem;
   text-align: center;
 }
-
-nav {
-  margin-top: 1rem;
-}
-
-nav a {
-  margin: 0 1rem;
-  color: white;
-  text-decoration: none;
-}
-
-.dropdown {
-  display: inline-block;
-  position: relative;
-}
-
-.dropbtn {
-  cursor: pointer;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #004aad;
-  min-width: 120px;
-  z-index: 1;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-.dropdown-content a {
-  display: block;
-  color: white;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-}
-
-.dropdown-content a:hover {
-  background-color: #00337a;
-}
-
-.tabs {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin: 2rem 0;
-}
-
 .tabs button {
-  padding: 0.7rem 1.5rem;
+  margin: 0.5rem;
+  padding: 0.75rem 1.5rem;
   background-color: #004aad;
   color: white;
   border: none;
@@ -72,26 +13,6 @@ nav a {
   cursor: pointer;
   font-weight: bold;
 }
-
 .tabs button:hover {
   background-color: #00337a;
-}
-
-.content-area {
-  text-align: center;
-  padding: 1rem;
-}
-
-footer {
-  text-align: center;
-  padding: 1rem;
-  background-color: #f1f1f1;
-  margin-top: 2rem;
-}
-
-footer .links a {
-  display: block;
-  margin-bottom: 0.5rem;
-  text-decoration: none;
-  color: #004aad;
 }
