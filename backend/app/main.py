@@ -143,6 +143,12 @@ async def stats(request: Request):
     return templates.TemplateResponse("stats_area.html", {"request": request})
 
 @app.get("/player", response_class=HTMLResponse)
+async def browse(request: Request):
+    """Serve the player page"""
+    return templates.TemplateResponse("player.html", {"request": request})
+
+
+@app.get("/player", response_class=HTMLResponse)
 async def player_entry(request: Request, access_token: str = Cookie(None)):
     """Redirect to dashboard if logged in, otherwise show login/register options."""
     if access_token and verify_token(access_token):
