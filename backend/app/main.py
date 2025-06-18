@@ -1,6 +1,6 @@
 
 import os
-from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException
+from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException, Response, Cookie
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -10,6 +10,8 @@ import bcrypt
 from pathlib import Path
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
 from bson.objectid import ObjectId
 
 # Load environment variables
@@ -26,6 +28,11 @@ templates = Jinja2Templates(directory="templates")
 # Create necessary directories
 uploads_dir = Path("static/uploads")
 uploads_dir.mkdir(parents=True, exist_ok=True)
+
+# JWT Configuration
+SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")  # Use env variable in production
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 # MongoDB setup with fallback to JSON
 MONGO_URI = os.getenv("MONGO_URI")
@@ -49,38 +56,52 @@ else:
     contact_collection = None
     print("Warning: MONGO_URI not set. Using JSON file storage.")
 
-# Helper function to save to JSON (fallback when MongoDB is not available)
-def save_to_json(data, filename="registrations.json"):
-    file_path = Path(filename)
-    if file_path.exists():
-        with open(file_path, "r") as f:
-            records = json.load(f)
-    else:
-        records = []
-    
-    records.append(data)
-    
-    with open(file_path, "w") as f:
-        json.dump(records, f, indent=2)
+# JWT Helper Functions
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-# MAIN ROUTES
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload.get("sub")
+    except JWTError:
+        return None
+
+# Helper function to save to JSON (fallback when MongoDB is not available)
+def save_to_json(data):
+    registrations_file = Path("registrations.json")
+    if registrations_file.exists():
+        with open(registrations_file, "r") as f:
+            registrations = json.load(f)
+    else:
+        registrations = []
+    
+    registrations.append(data)
+    
+    with open(registrations_file, "w") as f:
+        json.dump(registrations, f, indent=2)
+
+# Routes
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """Serve the home page"""
     try:
         return templates.TemplateResponse("index.html", {"request": request})
     except Exception:
-        # Fallback to register if index doesn't exist
+        # Fallback to registration form if index.html doesn't exist
         try:
             return templates.TemplateResponse("register.html", {"request": request})
         except Exception:
-            # Final fallback if templates don't work
-            try:
-                with open("register.html", "r") as f:
-                    html_content = f.read()
-                return HTMLResponse(content=html_content)
-            except Exception:
-                raise HTTPException(status_code=404, detail="Home page not found")
+            raise HTTPException(status_code=404, detail="Home page not found")
+
+@app.get("/register", response_class=HTMLResponse)
+async def get_register_form(request: Request):
+    """Serve the registration form"""
+    return templates.TemplateResponse("register.html", {"request": request})
 
 @app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
@@ -106,18 +127,39 @@ async def leaderboard(request: Request):
 async def contact(request: Request):
     return templates.TemplateResponse("contact.html", {"request": request})
 
-@app.get("/register", response_class=HTMLResponse)
-async def get_register_form(request: Request):
-    """Serve the registration form"""
-    return templates.TemplateResponse("register.html", {"request": request})
-
 @app.get("/login", response_class=HTMLResponse)
-async def get_login(request: Request):
+async def get_login(request: Request, access_token: str = Cookie(None)):
+    if access_token and verify_token(access_token):
+        return RedirectResponse(url="/dashboard", status_code=302)
     return templates.TemplateResponse("login.html", {"request": request})
 
-# AUTHENTICATION ROUTES
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request, access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    if not user_id:
+        return RedirectResponse(url="/login")
+
+    if not players_collection:
+        return RedirectResponse(url="/login")
+
+    user = players_collection.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        return RedirectResponse(url="/login")
+
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "player": user
+    })
+
+@app.get("/logout")
+async def logout():
+    response = RedirectResponse(url="/login", status_code=302)
+    response.delete_cookie("access_token")
+    return response
+
 @app.post("/login")
 async def post_login(
+    response: Response,
     request: Request,
     email: str = Form(...),
     password: str = Form(...)
@@ -143,14 +185,33 @@ async def post_login(
             "message": "Invalid email or password."
         })
 
-    # Success
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
-        "player": user,
-        "message": "Login successful!"
-    })
+    # Create JWT token and set cookie
+    token = create_access_token({"sub": str(user["_id"])})
+    res = RedirectResponse(url="/dashboard", status_code=302)
+    res.set_cookie("access_token", token, httponly=True, max_age=3600)
+    return res
 
-# REGISTRATION ROUTE
+@app.post("/submit-contact")
+async def submit_contact(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    message: str = Form(...)
+):
+    contact_data = {
+        "name": name,
+        "email": email,
+        "message": message
+    }
+    
+    if contact_collection:
+        try:
+            contact_collection.insert_one(contact_data)
+        except Exception as e:
+            print(f"Failed to save contact message: {e}")
+    
+    return templates.TemplateResponse("contact.html", {"request": request, "success": True})
+
 @app.post("/register")
 async def register_user(
     request: Request,
@@ -213,15 +274,6 @@ async def register_user(
                     content={"success": False, "message": f"Missing required fields: {', '.join(missing_fields)}"},
                     status_code=400
                 )
-            
-            # Check if email already exists
-            if players_collection:
-                existing_user = players_collection.find_one({"email": email})
-                if existing_user:
-                    return JSONResponse(
-                        content={"success": False, "message": "Email already registered"},
-                        status_code=400
-                    )
             
             # Handle photo upload
             photo_filename = None
@@ -316,34 +368,6 @@ async def register_user(
             status_code=500
         )
 
-# CONTACT ROUTE
-@app.post("/submit-contact")
-async def submit_contact(
-    request: Request,
-    name: str = Form(...),
-    email: str = Form(...),
-    message: str = Form(...)
-):
-    contact_data = {
-        "name": name,
-        "email": email,
-        "message": message
-    }
-    
-    if contact_collection:
-        try:
-            contact_collection.insert_one(contact_data)
-        except Exception as e:
-            print(f"MongoDB contact error: {e}")
-            # Fall back to JSON storage
-            save_to_json(contact_data, "contact_messages.json")
-    else:
-        # Save to JSON file
-        save_to_json(contact_data, "contact_messages.json")
-    
-    return templates.TemplateResponse("contact.html", {"request": request, "success": True})
-
-# SUCCESS PAGE
 @app.get("/success", response_class=HTMLResponse)
 async def registration_success():
     """Show registration success page"""
@@ -388,8 +412,7 @@ async def registration_success():
     </html>
     """)
 
-# API ENDPOINTS FOR DATA RETRIEVAL
-@app.get("/api/registrations")
+@app.get("/registrations")
 async def get_registrations():
     """Get all registrations (for testing purposes)"""
     if players_collection:
@@ -407,25 +430,6 @@ async def get_registrations():
         return {"registrations": registrations, "source": "json"}
     
     return {"registrations": [], "source": "none"}
-
-@app.get("/api/contacts")
-async def get_contacts():
-    """Get all contact messages (for admin purposes)"""
-    if contact_collection:
-        try:
-            contacts = list(contact_collection.find({}, {"_id": 0}))
-            return {"contacts": contacts, "source": "mongodb"}
-        except Exception as e:
-            print(f"MongoDB query error: {e}")
-    
-    # Fallback to JSON file
-    contacts_file = Path("contact_messages.json")
-    if contacts_file.exists():
-        with open(contacts_file, "r") as f:
-            contacts = json.load(f)
-        return {"contacts": contacts, "source": "json"}
-    
-    return {"contacts": [], "source": "none"}
 
 if __name__ == "__main__":
     import uvicorn
