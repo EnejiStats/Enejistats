@@ -31,7 +31,7 @@ uploads_dir = Path("static/uploads")
 uploads_dir.mkdir(parents=True, exist_ok=True)
 
 # JWT Configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
+SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")  # Use env variable in production
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
@@ -56,21 +56,6 @@ else:
     players_collection = None
     contact_collection = None
     print("Warning: MONGO_URI not set. Using JSON file storage.")
-
-# Page mapping for clean route handling
-PAGES = {
-    "about": "about.html",
-    "contact": "contact.html",
-    "leaderboard": "leaderboard.html",
-    "browse": "browse.html",
-    "stats-area": "stats-area.html",
-    "stats": "stats_area.html",
-    "player": "player.html",
-    "player-dashboard": "player-dashboard.html",
-    "dashboard": "dashboard.html",
-    "register": "register.html",
-    "login": "login.html"
-}
 
 # Pydantic Models
 class Player(BaseModel):
@@ -99,8 +84,8 @@ def verify_token(token: str):
     except JWTError:
         return None
 
+# Helper function to save to JSON (fallback when MongoDB is not available)
 def save_to_json(data):
-    """Helper function to save to JSON (fallback when MongoDB is not available)"""
     registrations_file = Path("registrations.json")
     if registrations_file.exists():
         with open(registrations_file, "r") as f:
@@ -121,63 +106,79 @@ async def home(request: Request):
     try:
         return templates.TemplateResponse("index.html", {"request": request})
     except Exception:
+        # Fallback to registration form if index.html doesn't exist
         try:
             return templates.TemplateResponse("register.html", {"request": request})
         except Exception:
             raise HTTPException(status_code=404, detail="Home page not found")
 
-# Static page routes
 @app.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
-    return templates.TemplateResponse(PAGES["about"], {"request": request})
+    """Serve the about page"""
+    return templates.TemplateResponse("about.html", {"request": request})
 
 @app.get("/contact", response_class=HTMLResponse)
 async def contact(request: Request):
-    return templates.TemplateResponse(PAGES["contact"], {"request": request})
+    """Serve the contact page"""
+    return templates.TemplateResponse("contact.html", {"request": request})
 
 @app.get("/leaderboard", response_class=HTMLResponse)
 async def leaderboard(request: Request):
-    return templates.TemplateResponse(PAGES["leaderboard"], {"request": request})
+    """Serve the leaderboard page"""
+    return templates.TemplateResponse("leaderboard.html", {"request": request})
 
 @app.get("/browse", response_class=HTMLResponse)
 async def browse(request: Request):
-    return templates.TemplateResponse(PAGES["browse"], {"request": request})
+    """Serve the browse page"""
+    return templates.TemplateResponse("browse.html", {"request": request})
 
 @app.get("/stats-area", response_class=HTMLResponse)
 async def stats_area(request: Request):
-    return templates.TemplateResponse(PAGES["stats-area"], {"request": request})
+    """Serve the stats area page"""
+    return templates.TemplateResponse("stats-area.html", {"request": request})
 
 @app.get("/stats", response_class=HTMLResponse)
 async def stats(request: Request):
-    return templates.TemplateResponse(PAGES["stats"], {"request": request})
+    """Serve the stats page"""
+    return templates.TemplateResponse("stats_area.html", {"request": request})
 
 @app.get("/player", response_class=HTMLResponse)
 async def player(request: Request):
-    return templates.TemplateResponse(PAGES["player"], {"request": request})
+    """Serve the player page"""
+    return templates.TemplateResponse("player.html", {"request": request})
 
-@app.get("/player-dashboard", response_class=HTMLResponse)
-async def player_dashboard(request: Request):
-    return templates.TemplateResponse(PAGES["player-dashboard"], {"request": request})
-
-# Stats routes
 @app.get("/stats/player", response_class=HTMLResponse)
 async def stats_player(request: Request):
+    """Serve the player stats page"""
     return templates.TemplateResponse("player_dashboard.html", {"request": request})
 
 @app.get("/stats/browse", response_class=HTMLResponse)
 async def stats_browse(request: Request):
-    return templates.TemplateResponse(PAGES["browse"], {"request": request})
+    """Serve the stats browse page"""
+    return templates.TemplateResponse("browse.html", {"request": request})
 
-# Authentication routes
 @app.get("/register", response_class=HTMLResponse)
 async def get_register_form(request: Request):
-    return templates.TemplateResponse(PAGES["register"], {"request": request})
+    """Serve the registration form"""
+    return templates.TemplateResponse("register.html", {"request": request})
 
 @app.get("/login", response_class=HTMLResponse)
 async def get_login(request: Request, access_token: str = Cookie(None)):
+    """Serve the login page"""
     if access_token and verify_token(access_token):
         return RedirectResponse(url="/dashboard", status_code=302)
-    return templates.TemplateResponse(PAGES["login"], {"request": request})
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/player", response_class=HTMLResponse)
+async def player_entry(request: Request):
+    """Serve the player entry page"""
+    return templates.TemplateResponse("player.html", {"request": request})
+
+@app.get("/player-dashboard", response_class=HTMLResponse)
+async def player_dashboard(request: Request):
+    """Serve the player dashboard page with session check"""
+    # Note: This would need proper session management implementation
+    return templates.TemplateResponse("player-dashboard.html", {"request": request})
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, access_token: str = Cookie(None)):
@@ -193,7 +194,7 @@ async def dashboard(request: Request, access_token: str = Cookie(None)):
     if not user:
         return RedirectResponse(url="/login")
 
-    return templates.TemplateResponse(PAGES["dashboard"], {
+    return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "player": user
     })
@@ -249,7 +250,6 @@ async def registration_success():
     </html>
     """)
 
-# Data routes
 @app.get("/registrations")
 async def get_registrations():
     """Get all registrations (for testing purposes)"""
@@ -260,6 +260,7 @@ async def get_registrations():
         except Exception as e:
             print(f"MongoDB query error: {e}")
     
+    # Fallback to JSON file
     registrations_file = Path("registrations.json")
     if registrations_file.exists():
         with open(registrations_file, "r") as f:
@@ -268,7 +269,6 @@ async def get_registrations():
     
     return {"registrations": [], "source": "none"}
 
-# Form submission routes
 @app.post("/login")
 async def post_login(
     response: Response,
@@ -278,7 +278,7 @@ async def post_login(
 ):
     """Handle user login"""
     if not players_collection:
-        return templates.TemplateResponse(PAGES["login"], {
+        return templates.TemplateResponse("login.html", {
             "request": request,
             "message": "Database not available."
         })
@@ -286,18 +286,19 @@ async def post_login(
     user = players_collection.find_one({"email": email})
 
     if not user:
-        return templates.TemplateResponse(PAGES["login"], {
+        return templates.TemplateResponse("login.html", {
             "request": request,
             "message": "Invalid email or password."
         })
 
     stored_password = user["password"]
     if not bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
-        return templates.TemplateResponse(PAGES["login"], {
+        return templates.TemplateResponse("login.html", {
             "request": request,
             "message": "Invalid email or password."
         })
 
+    # Create JWT token and set cookie
     token = create_access_token({"sub": str(user["_id"])})
     res = RedirectResponse(url="/dashboard", status_code=302)
     res.set_cookie("access_token", token, httponly=True, max_age=3600)
@@ -323,7 +324,7 @@ async def submit_contact(
         except Exception as e:
             print(f"Failed to save contact message: {e}")
     
-    return templates.TemplateResponse(PAGES["contact"], {"request": request, "success": True})
+    return templates.TemplateResponse("contact.html", {"request": request, "success": True})
 
 @app.post("/register")
 async def register_user(
@@ -394,12 +395,14 @@ async def register_user(
         
         else:
             # Handle web form registration
+            # Basic validation
             if userType not in ["player", "club", "scout"]:
                 return JSONResponse(
                     content={"success": False, "message": "Invalid user type"},
                     status_code=400
                 )
             
+            # Handle player registration
             if userType == "player":
                 # Validate required fields
                 required_fields = {
@@ -429,6 +432,7 @@ async def register_user(
                 # Handle photo upload
                 photo_filename = None
                 if playerPhoto and playerPhoto.filename:
+                    # Validate file size (20KB limit)
                     content = await playerPhoto.read()
                     if len(content) > 20 * 1024:  # 20KB
                         return JSONResponse(
@@ -436,11 +440,13 @@ async def register_user(
                             status_code=400
                         )
                     
+                    # Generate filename
                     if firstName and lastName:
                         photo_filename = f"{firstName.lower()}_{lastName.lower()}.jpg"
                     else:
                         photo_filename = f"{email}_{playerPhoto.filename}"
                     
+                    # Save the file
                     file_path = uploads_dir / photo_filename
                     with open(file_path, "wb") as buffer:
                         buffer.write(content)
@@ -479,6 +485,7 @@ async def register_user(
                 # Save to MongoDB if available, otherwise save to JSON
                 if players_collection:
                     try:
+                        # Remove userType and None values for database
                         clean_data = {k: v for k, v in registration_data.items() 
                                      if v is not None and k != 'userType'}
                         
@@ -487,18 +494,21 @@ async def register_user(
                         
                     except Exception as e:
                         print(f"MongoDB error: {e}")
+                        # Fall back to JSON storage
                         save_to_json(registration_data)
                         return JSONResponse(
                             content={"success": True, "message": "Player registration successful! (Saved to backup)"},
                             status_code=200
                         )
                 else:
+                    # Save to JSON file
                     save_to_json(registration_data)
                     return JSONResponse(
                         content={"success": True, "message": "Player registration successful!"},
                         status_code=200
                     )
             
+            # Handle club and scout registrations (coming soon)
             elif userType in ["club", "scout"]:
                 return JSONResponse(
                     content={"success": False, "message": f"{userType.title()} registration coming soon!"},
