@@ -1,0 +1,176 @@
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f5f7fa; color: #333; }
+header, footer { background-color: #1e1e2f; color: white; padding: 1rem; text-align: center; }
+nav { margin-top: 0.5rem; }
+nav a { color: white; margin: 0 0.75rem; text-decoration: none; font-weight: 500; }
+main { max-width: 800px; margin: 2rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+h2 { text-align: center; color: #004aad; }
+form { display: flex; flex-direction: column; }
+label { margin-top: 1rem; font-weight: bold; }
+input, select {
+  padding: 0.6rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 0.3rem;
+  width: 100%;
+}
+fieldset {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+legend {
+  padding: 0 0.5rem;
+  font-weight: bold;
+  color: #004aad;
+}
+.hidden { display: none; }
+.coming-soon {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  font-size: 1.1rem;
+  padding: 2rem;
+}
+.position-category {
+  margin-bottom: 1rem;
+}
+.position-options {
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+}
+.position-options label {
+  display: block;
+  margin: 0.3rem 0;
+  font-weight: normal;
+}
+.position-options input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+/* Other Positions Dropdown Styles */
+.other-positions-dropdown {
+  position: relative;
+  margin-top: 0.3rem;
+}
+
+.other-positions-trigger {
+  padding: 0.6rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.other-positions-trigger:hover {
+  border-color: #004aad;
+}
+
+.dropdown-arrow {
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.other-positions-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.positions-grid {
+  padding: 1rem;
+}
+
+.position-category-grid {
+  margin-bottom: 1.5rem;
+}
+
+.category-title {
+  font-weight: bold;
+  color: #004aad;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #eee;
+}
+
+.positions-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.position-checkbox {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.position-checkbox:hover {
+  background-color: #f0f8ff;
+}
+
+.position-checkbox input[type="checkbox"] {
+  width: auto;
+  margin: 0 0.5rem 0 0;
+  cursor: pointer;
+}
+
+.position-checkbox label {
+  margin: 0;
+  font-weight: normal;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex: 1;
+}
+
+.selected-positions {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+button {
+  margin-top: 2rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background-color: #004aad;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+button:hover { background-color: #00357a; }
+footer p { margin: 0.5rem 0 0; }
+@media (max-width: 600px) { 
+  main { padding: 1rem; }
+  .positions-row {
+    grid-template-columns: 1fr;
+  }
+}
