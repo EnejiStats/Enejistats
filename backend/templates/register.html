@@ -41,382 +41,1011 @@
       z-index: 1;
     }
     
-    .validation-icon {
+    .validation-indicator {
       position: absolute;
-      right: 40px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
       font-size: 1.2rem;
+      z-index: 1;
     }
     
-    .validation-icon.success { color: green; }
-    .validation-icon.error { color: red; }
+    .validation-indicator.success {
+      color: #28a745;
+    }
+    
+    .validation-indicator.error {
+      color: #dc3545;
+    }
     
     .photo-preview {
-      max-width: 150px;
-      max-height: 150px;
-      margin-top: 10px;
+      margin-top: 0.5rem;
+      max-width: 200px;
+      max-height: 200px;
+      border: 2px solid #ddd;
       border-radius: 5px;
       display: none;
+    }
+    
+    .photo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    fieldset {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+    legend {
+      padding: 0 0.5rem;
+      font-weight: bold;
+      color: #004aad;
+    }
+    .hidden { display: none; }
+    .coming-soon {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      font-size: 1.1rem;
+      padding: 2rem;
+    }
+    .position-category {
+      margin-bottom: 1rem;
+    }
+    .position-options {
+      margin-left: 1rem;
+      margin-top: 0.5rem;
+    }
+    .position-options label {
+      display: block;
+      margin: 0.3rem 0;
+      font-weight: normal;
+    }
+    .position-options input[type="checkbox"] {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+    
+    /* Other Positions Dropdown Styles */
+    .other-positions-dropdown {
+      position: relative;
+      margin-top: 0.3rem;
+    }
+    
+    .other-positions-trigger {
+      padding: 0.6rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .other-positions-trigger:hover {
+      border-color: #004aad;
+    }
+    
+    .dropdown-arrow {
+      transform: rotate(0deg);
+      transition: transform 0.2s ease;
+    }
+    
+    .dropdown-arrow.open {
+      transform: rotate(180deg);
+    }
+    
+    .other-positions-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .positions-grid {
+      padding: 1rem;
+    }
+    
+    .position-category-grid {
+      margin-bottom: 1.5rem;
+    }
+    
+    .category-title {
+      font-weight: bold;
+      color: #004aad;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .positions-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .position-checkbox {
+      display: flex;
+      align-items: center;
+      padding: 0.3rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .position-checkbox:hover {
+      background-color: #f0f8ff;
+    }
+    
+    .position-checkbox input[type="checkbox"] {
+      width: auto;
+      margin: 0 0.5rem 0 0;
+      cursor: pointer;
+    }
+    
+    .position-checkbox label {
+      margin: 0;
+      font-weight: normal;
+      font-size: 0.9rem;
+      cursor: pointer;
+      flex: 1;
+    }
+    
+    .selected-positions {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.2rem;
     }
     
     button {
+      margin-top: 2rem;
+      padding: 0.75rem;
+      font-size: 1rem;
       background-color: #004aad;
       color: white;
-      padding: 0.8rem;
       border: none;
-      border-radius: 5px;
-      margin-top: 1.5rem;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 1rem;
+      transition: background 0.2s ease;
     }
-    
-    button:hover { background-color: #003688; }
-    button:disabled { background-color: #ccc; cursor: not-allowed; }
-    
+    button:hover { background-color: #00357a; }
+    footer p { margin: 0.5rem 0 0; }
     .error-message {
       color: red;
       font-size: 0.9rem;
-      margin-top: 0.3rem;
-      display: none;
+      margin-top: 0.5rem;
     }
-    
     .success-message {
       color: green;
       font-size: 0.9rem;
-      margin-top: 0.3rem;
-      display: none;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 600px) { 
+      main { padding: 1rem; }
+      .positions-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Enejistats</h1>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/register">Register</a>
-      <a href="/login">Login</a>
-    </nav>
-  </header>
-
-  <main>
-    <h2>Player Registration</h2>
-    <form id="registrationForm" enctype="multipart/form-data">
-      <label for="full_name">Full Name:</label>
-      <div class="input-group">
-        <input type="text" id="full_name" name="full_name" required />
-        <span class="validation-icon" id="name-icon"></span>
+<header>
+  <h1>Enejistats</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <div class="dropdown">
+      <span class="dropbtn">Stats Area ▾</span>
+      <div class="dropdown-content">
+        <a href="/stats/player">Player</a>
+        <a href="/stats/browse">Browse</a>
       </div>
-      <div class="error-message" id="name-error"></div>
+    </div>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/contact">Contact</a>
+    <a href="/register">Register / Sign In</a>
+  </nav>
+</header>
+<main>
+  <h2>User Registration</h2>
+  <div id="messageArea">
+  {% if error %}
+    <div class="error-message">{{ error }}</div>
+  {% elif success %}
+    <div class="success-message">{{ success }}</div>
+  {% endif %}
+</div>
+  <form id="registrationForm" action="/register" method="post" enctype="multipart/form-data">
+    <label for="userType">User Type</label>
+    <select id="userType" name="userType" onchange="displayFields()" required>
+      <option value="">-- Select User Type --</option>
+      <option value="player">Player</option>
+      <option value="club">Club</option>
+      <option value="scout">Scout / Agent</option>
+    </select>
 
-      <label for="email">Email:</label>
+    <!-- Player Fields -->
+    <fieldset id="playerFields" class="user-fields hidden">
+      <legend>Player Details</legend>
+      
+      <label for="firstName">First Name</label>
       <div class="input-group">
-        <input type="email" id="email" name="email" required />
-        <span class="validation-icon" id="email-icon"></span>
+        <input type="text" id="firstName" name="firstName" onblur="validateField('firstName')" />
+        <span class="validation-indicator" id="firstName-indicator"></span>
       </div>
-      <div class="error-message" id="email-error"></div>
-
-      <label for="phone">Phone Number:</label>
+      
+      <label for="middleName">Middle Name (Optional)</label>
       <div class="input-group">
-        <input type="tel" id="phone" name="phone" required />
-        <span class="validation-icon" id="phone-icon"></span>
+        <input type="text" id="middleName" name="middleName" />
       </div>
-
-      <label for="state">State:</label>
+      
+      <label for="lastName">Last Name</label>
       <div class="input-group">
-        <select id="state" name="state" required>
-          <option value="">Select State</option>
-          <option value="Lagos">Lagos</option>
-          <option value="Abuja">Abuja</option>
-          <option value="Kano">Kano</option>
-          <option value="Rivers">Rivers</option>
-          <option value="Oyo">Oyo</option>
-          <option value="Delta">Delta</option>
-          <option value="Kaduna">Kaduna</option>
-          <option value="Ogun">Ogun</option>
-          <option value="Imo">Imo</option>
-          <option value="Borno">Borno</option>
-          <option value="Anambra">Anambra</option>
-          <option value="Akwa Ibom">Akwa Ibom</option>
-          <option value="Osun">Osun</option>
-          <option value="Ondo">Ondo</option>
-          <option value="Enugu">Enugu</option>
-          <option value="Kwara">Kwara</option>
-          <option value="Abia">Abia</option>
-          <option value="Adamawa">Adamawa</option>
-          <option value="Cross River">Cross River</option>
-          <option value="Jigawa">Jigawa</option>
-          <option value="Gombe">Gombe</option>
-          <option value="Sokoto">Sokoto</option>
-          <option value="Benue">Benue</option>
-          <option value="Yobe">Yobe</option>
-          <option value="Taraba">Taraba</option>
-          <option value="Kebbi">Kebbi</option>
-          <option value="Plateau">Plateau</option>
-          <option value="Zamfara">Zamfara</option>
-          <option value="Bauchi">Bauchi</option>
-          <option value="Kogi">Kogi</option>
-          <option value="Katsina">Katsina</option>
-          <option value="Niger">Niger</option>
-          <option value="Ebonyi">Ebonyi</option>
-          <option value="Edo">Edo</option>
-          <option value="Ekiti">Ekiti</option>
-          <option value="Bayelsa">Bayelsa</option>
-          <option value="Nasarawa">Nasarawa</option>
-        </select>
-        <span class="validation-icon" id="state-icon"></span>
+        <input type="text" id="lastName" name="lastName" onblur="validateField('lastName')" />
+        <span class="validation-indicator" id="lastName-indicator"></span>
+      </div>
+      
+      <label for="email">Email Address</label>
+      <div class="input-group">
+        <input type="email" id="email" name="email" onblur="validateField('email')" />
+        <span class="validation-indicator" id="email-indicator"></span>
       </div>
 
-      <label for="gender">Gender:</label>
+      <label for="password">Password</label>
       <div class="input-group">
-        <select id="gender" name="gender" required>
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
-        <span class="validation-icon" id="gender-icon"></span>
-      </div>
-
-      <label for="password">Password:</label>
-      <div class="input-group">
-        <input type="password" id="password" name="password" required />
-        <span class="validation-icon" id="password-icon"></span>
+        <input type="password" id="password" name="password" onblur="validateField('password')" />
         <span class="password-toggle" onclick="togglePassword('password')">👁️</span>
       </div>
-
-      <label for="confirm_password">Confirm Password:</label>
-      <div class="input-group">
-        <input type="password" id="confirm_password" name="confirm_password" required />
-        <span class="validation-icon" id="confirm-password-icon"></span>
-        <span class="password-toggle" onclick="togglePassword('confirm_password')">👁️</span>
-      </div>
-      <div class="error-message" id="password-error"></div>
-
-      <label for="photo">Photo (max 200KB):</label>
-      <div class="input-group">
-        <input type="file" id="photo" name="photo" accept="image/*" required />
-        <span class="validation-icon" id="photo-icon"></span>
-      </div>
-      <img id="photoPreview" class="photo-preview" />
-      <div class="error-message" id="photo-error"></div>
-
-      <button type="submit" id="submitBtn">Register</button>
-      <div class="success-message" id="success-message"></div>
-      <div class="error-message" id="general-error"></div>
-    </form>
-  </main>
-
-  <footer>
-    <p>&copy; 2024 Enejistats. All rights reserved.</p>
-  </footer>
-
-  <script>
-    function togglePassword(fieldId) {
-      const field = document.getElementById(fieldId);
-      const icon = field.nextElementSibling.nextElementSibling;
       
-      if (field.type === 'password') {
-        field.type = 'text';
-        icon.textContent = '🙈';
-      } else {
-        field.type = 'password';
-        icon.textContent = '👁️';
-      }
+      <label for="confirmPassword">Confirm Password</label>
+      <div class="input-group">
+        <input type="password" id="confirmPassword" name="confirmPassword" onblur="validateField('confirmPassword')" />
+        <span class="validation-indicator" id="confirmPassword-indicator"></span>
+      </div>
+      
+      <div id="dobField">
+        <label for="dob">Date of Birth</label>
+        <div class="input-group">
+          <input type="date" id="dob" name="dob" onblur="validateField('dob')" />
+          <span class="validation-indicator" id="dob-indicator"></span>
+        </div>
+      </div>
+      
+      <label for="gender">Gender</label>
+      <div class="input-group">
+        <select id="gender" name="gender" onchange="validateField('gender')">
+          <option value="">Select</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        <span class="validation-indicator" id="gender-indicator"></span>
+      </div>
+      
+      <label for="playerNationality">Nationality</label>
+      <div class="input-group">
+        <select id="playerNationality" name="playerNationality" onchange="validateField('playerNationality')">
+          <option value="">Select Country</option>
+        </select>
+        <span class="validation-indicator" id="playerNationality-indicator"></span>
+      </div>
+      
+      <div class="photo-container">
+        <label for="playerPhoto">Passport Photo (Max 200KB)</label>
+        <div class="input-group">
+          <input type="file" id="playerPhoto" name="playerPhoto" accept="image/*" onchange="validatePhoto()" />
+          <span class="validation-indicator" id="playerPhoto-indicator"></span>
+        </div>
+        <img id="photoPreview" class="photo-preview" alt="Photo Preview" />
+      </div>
+      
+      <label for="preferredPositionCategory">Preferred Position</label>
+      <div class="input-group">
+        <select id="preferredPositionCategory" name="preferredPositionCategory" onchange="showPreferredPositions(); validateField('preferredPositionCategory')">
+          <option value="">Select Position Category</option>
+          <option value="goalkeeper">Goalkeeper</option>
+          <option value="defender">Defender</option>
+          <option value="midfielder">Midfielder</option>
+          <option value="attacker">Attacker</option>
+        </select>
+        <span class="validation-indicator" id="preferredPositionCategory-indicator"></span>
+      </div>
+      
+      <div id="preferredPositionOptions" class="hidden">
+        <label for="preferredPosition">Specific Position</label>
+        <div class="input-group">
+          <select id="preferredPosition" name="preferredPosition" onchange="validateField('preferredPosition')">
+            <option value="">Select Position</option>
+          </select>
+          <span class="validation-indicator" id="preferredPosition-indicator"></span>
+        </div>
+      </div>
+      
+      <label for="otherPositionsDropdown">Other Positions (Optional - Multiple Selection)</label>
+      <div class="other-positions-dropdown">
+        <div class="other-positions-trigger" onclick="toggleOtherPositionsDropdown()">
+          <span id="otherPositionsDisplay">Click to select positions</span>
+          <span class="dropdown-arrow" id="dropdownArrow">▼</span>
+        </div>
+        <div id="otherPositionsPanel" class="other-positions-panel hidden">
+          <div class="positions-grid">
+            <div class="position-category-grid">
+              <div class="category-title">Goalkeeper</div>
+              <div class="positions-row">
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="GK" id="other-gk" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-gk">GK - Goalkeeper</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="SWK" id="other-swk" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-swk">SWK - Sweeper Keeper</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="position-category-grid">
+              <div class="category-title">Defender</div>
+              <div class="positions-row">
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="CB" id="other-cb" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-cb">CB - Centre Back</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="RCB" id="other-rcb" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-rcb">RCB - Right Centre Back</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="LCB" id="other-lcb" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-lcb">LCB - Left Centre Back</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="LB" id="other-lb" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-lb">LB - Left Back</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="RB" id="other-rb" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-rb">RB - Right Back</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="LWB" id="other-lwb" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-lwb">LWB - Left Wing Back</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="RWB" id="other-rwb" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-rwb">RWB - Right Wing Back</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="position-category-grid">
+              <div class="category-title">Midfielder</div>
+              <div class="positions-row">
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="CDM" id="other-cdm" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-cdm">CDM - Central Defensive Midfielder</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="CM" id="other-cm" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-cm">CM - Central Midfielder</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="CAM" id="other-cam" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-cam">CAM - Central Attacking Midfielder</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="RM" id="other-rm" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-rm">RM - Right Midfielder</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="LM" id="other-lm" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-lm">LM - Left Midfielder</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="RW" id="other-rw" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-rw">RW - Right Winger</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="LW" id="other-lw" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-lw">LW - Left Winger</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="DM" id="other-dm" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-dm">DM - Defensive Midfielder</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="AM" id="other-am" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-am">AM - Attacking Midfielder</label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="position-category-grid">
+              <div class="category-title">Attacker</div>
+              <div class="positions-row">
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="ST" id="other-st" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-st">ST - Striker</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="CF" id="other-cf" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-cf">CF - Centre Forward</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="LF" id="other-lf" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-lf">LF - Left Forward</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="RF" id="other-rf" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-rf">RF - Right Forward</label>
+                </div>
+                <div class="position-checkbox">
+                  <input type="checkbox" name="otherPositions" value="SS" id="other-ss" onchange="updateOtherPositionsDisplay()">
+                  <label for="other-ss">SS - Second Striker</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <label for="dominantFoot">Dominant Foot</label>
+      <div class="input-group">
+        <select id="dominantFoot" name="dominantFoot" onchange="validateField('dominantFoot')">
+          <option value="">Select</option>
+          <option value="left">Left</option>
+          <option value="right">Right</option>
+          <option value="both">Both</option>
+        </select>
+        <span class="validation-indicator" id="dominantFoot-indicator"></span>
+      </div>
+      
+      <label for="height">Height (cm)</label>
+      <div class="input-group">
+        <input type="number" id="height" name="height" onblur="validateField('height')" />
+        <span class="validation-indicator" id="height-indicator"></span>
+      </div>
+      
+      <label for="weight">Weight (kg)</label>
+      <div class="input-group">
+        <input type="number" id="weight" name="weight" onblur="validateField('weight')" />
+        <span class="validation-indicator" id="weight-indicator"></span>
+      </div>
+      
+      <label for="league">League</label>
+      <div class="input-group">
+        <select id="league" name="league" onchange="handleLeagueChange(); validateField('league')">
+          <option value="">Select League</option>
+          <option value="npfl">Nigerian Professional Football League</option>
+          <option value="nnl1">Nigerian National League One</option>
+          <option value="nnl2">Nigerian National League Two</option>
+          <option value="academy">Academy</option>
+          <option value="street">Street Clubs</option>
+          <option value="university">University</option>
+        </select>
+        <span class="validation-indicator" id="league-indicator"></span>
+      </div>
+      
+      <div id="leagueClubDropdown" class="hidden">
+        <label for="leagueClub">Select Club/Team</label>
+        <div class="input-group">
+          <select id="leagueClub" name="leagueClub" onchange="handleClubSelection('leagueClub'); validateField('leagueClub')">
+            <option value="">Select Club/Team</option>
+          </select>
+          <span class="validation-indicator" id="leagueClub-indicator"></span>
+        </div>
+      </div>
+      
+      <div id="generalClubDropdown" class="hidden">
+        <label for="generalClub">Select Club/Team</label>
+        <div class="input-group">
+          <select id="generalClub" name="generalClub" onchange="handleClubSelection('generalClub'); validateField('generalClub')">
+            <option value="">Select Club/Team</option>
+          </select>
+          <span class="validation-indicator" id="generalClub-indicator"></span>
+        </div>
+      </div>
+      
+      <div id="customClubField" class="hidden">
+        <label for="customClub">Enter Club/Team Name</label>
+        <div class="input-group">
+          <input type="text" id="customClub" name="customClub" placeholder="Enter club/team name" onblur="validateField('customClub')" />
+          <span class="validation-indicator" id="customClub-indicator"></span>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Club Fields -->
+    <fieldset id="clubFields" class="user-fields hidden">
+      <legend>Club Registration</legend>
+      <div class="coming-soon">Coming Soon</div>
+    </fieldset>
+
+    <!-- Scout Fields -->
+    <fieldset id="scoutFields" class="user-fields hidden">
+      <legend>Scout/Agent Registration</legend>
+      <div class="coming-soon">Coming Soon</div>
+    </fieldset>
+
+    <button type="submit">Submit</button>
+  </form>
+</main>
+<footer>
+  <div class="links">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/stats">Stats Area</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/contact">Contact</a>
+    <a href="/register">Register</a>
+  </div>
+  <p>&copy; <span id="year"></span> Enejistats. All rights reserved.</p>
+</footer>
+<script>
+  // Countries list for nationality dropdown
+  const countries = [
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
+    "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
+    "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada",
+    "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia",
+    "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador",
+    "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia",
+    "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti",
+    "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
+    "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
+    "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia",
+    "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco",
+    "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand",
+    "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine",
+    "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia",
+    "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia",
+    "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan",
+    "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania",
+    "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda",
+    "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
+    "Yemen", "Zambia", "Zimbabwe"
+  ];
+
+  // Position data
+  const positions = {
+    goalkeeper: [
+      { value: "GK", text: "GK - Goalkeeper" },
+      { value: "SWK", text: "SWK - Sweeper Keeper" }
+    ],
+    defender: [
+      { value: "CB", text: "CB - Centre Back" },
+      { value: "RCB", text: "RCB - Right Centre Back" },
+      { value: "LCB", text: "LCB - Left Centre Back" },
+      { value: "LB", text: "LB - Left Back" },
+      { value: "RB", text: "RB - Right Back" },
+      { value: "LWB", text: "LWB - Left Wing Back" },
+      { value: "RWB", text: "RWB - Right Wing Back" }
+    ],
+    midfielder: [
+      { value: "CDM", text: "CDM - Central Defensive Midfielder" },
+      { value: "CM", text: "CM - Central Midfielder" },
+      { value: "CAM", text: "CAM - Central Attacking Midfielder" },
+      { value: "RM", text: "RM - Right Midfielder" },
+      { value: "LM", text: "LM - Left Midfielder" },
+      { value: "RW", text: "RW - Right Winger" },
+      { value: "LW", text: "LW - Left Winger" },
+      { value: "DM", text: "DM - Defensive Midfielder" },
+      { value: "AM", text: "AM - Attacking Midfielder" }
+    ],
+    attacker: [
+      { value: "ST", text: "ST - Striker" },
+      { value: "CF", text: "CF - Centre Forward" },
+      { value: "LF", text: "LF - Left Forward" },
+      { value: "RF", text: "RF - Right Forward" },
+      { value: "SS", text: "SS - Second Striker" }
+    ]
+  };
+
+  // League clubs data
+  const leagueClubs = {
+    npfl: [
+      "Enyimba FC", "Kano Pillars", "Rivers United", "Plateau United", "Shooting Stars SC", "3SC Ibadan",
+      "Akwa United", "Lobi Stars", "Heartland FC", "Rangers International", "Kwara United", "Nasarawa United",
+      "Dakkada FC", "Sunshine Stars", "Wikki Tourist", "MFM FC", "FC IfeanyiUbah", "Katsina United",
+      "Jigawa Golden Stars", "Warri Wolves"
+    ],
+    nnl1: [
+      "Gombe United", "El-Kanemi Warriors", "ABS FC", "Insurance FC", "Real Sapphire", "Gateway United",
+      "Bendel Insurance", "Osun United", "Delta Force", "COD United", "Niger Tornadoes", "Crown FC",
+      "Go Round FC", "Adamawa United", "Sokoto United", "Zamfara United"
+    ],
+    nnl2: [
+      "Confluence Stars", "Ottasolo FC", "Beyond Limits", "Mighty Jets", "Ekiti United", "Bayelsa United",
+      "Sporting Supreme", "Liberty FC", "FC One Rocket", "Kogi United", "Yobe Desert Stars", "Gombe Bulls",
+      "Kebbi United", "Taraba FC", "Jigawa Stars", "Bauchi United"
+    ],
+    academy: [
+      "Pepsi Football Academy", "36 Lion FC Academy", "Right to Dream Academy Nigeria", "Barcelona Academy Lagos",
+      "Manchester City Football School", "Lagos State FA Academy", "Flying Eagles Academy", "Golden Eaglets Academy",
+      "Future Eagles Academy", "Dream Team Academy", "Crown FC Academy", "Shooting Stars Academy"
+    ]
+  };
+
+  // General clubs for street and university
+  const generalClubs = [
+    // Street clubs
+    "Lagos City FC", "Abuja FC", "Kano United", "Port Harcourt City", "Kaduna United", "Ibadan City FC",
+    "Jos Plateau FC", "Maiduguri FC", "Calabar Rovers", "Warri City FC", "Benin City FC", "Lokoja United",
+    
+    // University clubs
+    "University of Lagos FC", "University of Nigeria Nsukka FC", "Ahmadu Bello University FC", "University of Ibadan FC",
+    "University of Benin FC", "Federal University of Technology Akure FC", "University of Port Harcourt FC",
+    "Bayero University Kano FC", "University of Jos FC", "Federal University Lokoja FC", "Nnamdi Azikiwe University FC",
+    "Michael Okpara University FC", "University of Calabar FC", "Rivers State University FC"
+  ];
+
+  function showMessage(message, isError = false) {
+    const messageArea = document.getElementById('messageArea');
+    messageArea.innerHTML = `<div class="${isError ? 'error-message' : 'success-message'}">${message}</div>`;
+    setTimeout(() => {
+      messageArea.innerHTML = '';
+    }, 5000);
+  }
+
+  function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+    field.setAttribute('type', type);
+  }
+
+  function validateField(fieldId) {
+    const field = document.getElementById(fieldId);
+    const indicator = document.getElementById(fieldId + '-indicator');
+    const value = field.value.trim();
+    
+    let isValid = false;
+    let errorMessage = '';
+
+    switch (fieldId) {
+      case 'firstName':
+      case 'lastName':
+        isValid = value.length >= 2;
+        if (!isValid) errorMessage = 'Name must be at least 2 characters';
+        break;
+      
+      case 'email':
+        const emailPattern = /^[^@]+@[^@]+\.[^@]+$/;
+        isValid = emailPattern.test(value);
+        if (!isValid) errorMessage = 'Please enter a valid email address';
+        break;
+      
+      case 'password':
+        isValid = value.length >= 6;
+        if (!isValid) errorMessage = 'Password must be at least 6 characters';
+        // Also validate confirm password if it has a value
+        const confirmPassword = document.getElementById('confirmPassword');
+        if (confirmPassword.value) {
+          validateField('confirmPassword');
+        }
+        break;
+      
+      case 'confirmPassword':
+        const password = document.getElementById('password').value;
+        isValid = value === password && value.length > 0;
+        if (!isValid) errorMessage = 'Passwords do not match';
+        break;
+      
+      case 'dob':
+        isValid = value !== '';
+        if (!isValid) errorMessage = 'Date of birth is required';
+        break;
+      
+      case 'height':
+        const height = parseInt(value);
+        isValid = height >= 100 && height <= 250;
+        if (!isValid) errorMessage = 'Height must be between 100-250 cm';
+        break;
+      
+      case 'weight':
+        const weight = parseInt(value);
+        isValid = weight >= 30 && weight <= 200;
+        if (!isValid) errorMessage = 'Weight must be between 30-200 kg';
+        break;
+      
+      default:
+        isValid = value !== '';
+        if (!isValid) errorMessage = 'This field is required';
+        break;
     }
 
-    function showValidationIcon(fieldId, isValid) {
-      const icon = document.getElementById(fieldId + '-icon');
+    if (indicator) {
       if (isValid) {
-        icon.textContent = '✓';
-        icon.className = 'validation-icon success';
+        indicator.innerHTML = '✓';
+        indicator.className = 'validation-indicator success';
+        indicator.title = '';
       } else {
-        icon.textContent = '●';
-        icon.className = 'validation-icon error';
+        indicator.innerHTML = '●';
+        indicator.className = 'validation-indicator error';
+        indicator.title = errorMessage;
       }
     }
 
-    function hideValidationIcon(fieldId) {
-      const icon = document.getElementById(fieldId + '-icon');
-      icon.textContent = '';
-      icon.className = 'validation-icon';
-    }
+    return isValid;
+  }
 
-    // Real-time validation
-    document.getElementById('full_name').addEventListener('input', function() {
-      const value = this.value.trim();
-      if (value.length > 2) {
-        // Check if user exists
-        fetch(`/check-user?full_name=${encodeURIComponent(value)}`)
-          .then(response => response.json())
-          .then(data => {
-            if (data.exists) {
-              showValidationIcon('name', false);
-              document.getElementById('name-error').textContent = 'User with this name already exists';
-              document.getElementById('name-error').style.display = 'block';
-            } else {
-              showValidationIcon('name', true);
-              document.getElementById('name-error').style.display = 'none';
-            }
-          });
-      } else {
-        hideValidationIcon('name');
-      }
-    });
-
-    document.getElementById('email').addEventListener('input', function() {
-      const value = this.value.trim();
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function validatePhoto() {
+    const photoInput = document.getElementById('playerPhoto');
+    const indicator = document.getElementById('playerPhoto-indicator');
+    const preview = document.getElementById('photoPreview');
+    
+    if (photoInput.files.length > 0) {
+      const file = photoInput.files[0];
+      const maxSize = 200 * 1024; // 200KB in bytes
       
-      if (emailRegex.test(value)) {
-        // Check if email exists
-        fetch(`/check-user?email=${encodeURIComponent(value)}`)
-          .then(response => response.json())
-          .then(data => {
-            if (data.exists) {
-              showValidationIcon('email', false);
-              document.getElementById('email-error').textContent = 'Email already registered';
-              document.getElementById('email-error').style.display = 'block';
-            } else {
-              showValidationIcon('email', true);
-              document.getElementById('email-error').style.display = 'none';
-            }
-          });
-      } else {
-        hideValidationIcon('email');
-      }
-    });
-
-    document.getElementById('phone').addEventListener('input', function() {
-      const value = this.value.trim();
-      if (value.length >= 10) {
-        showValidationIcon('phone', true);
-      } else {
-        hideValidationIcon('phone');
-      }
-    });
-
-    document.getElementById('state').addEventListener('change', function() {
-      if (this.value) {
-        showValidationIcon('state', true);
-      } else {
-        hideValidationIcon('state');
-      }
-    });
-
-    document.getElementById('gender').addEventListener('change', function() {
-      if (this.value) {
-        showValidationIcon('gender', true);
-      } else {
-        hideValidationIcon('gender');
-      }
-    });
-
-    document.getElementById('password').addEventListener('input', function() {
-      const value = this.value;
-      if (value.length >= 6) {
-        showValidationIcon('password', true);
-      } else {
-        hideValidationIcon('password');
-      }
-      checkPasswordMatch();
-    });
-
-    document.getElementById('confirm_password').addEventListener('input', function() {
-      checkPasswordMatch();
-    });
-
-    function checkPasswordMatch() {
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirm_password').value;
-      
-      if (confirmPassword && password === confirmPassword) {
-        showValidationIcon('confirm-password', true);
-        document.getElementById('password-error').style.display = 'none';
-      } else if (confirmPassword) {
-        showValidationIcon('confirm-password', false);
-        document.getElementById('password-error').textContent = 'Passwords do not match';
-        document.getElementById('password-error').style.display = 'block';
-      } else {
-        hideValidationIcon('confirm-password');
-      }
-    }
-
-    document.getElementById('photo').addEventListener('change', function() {
-      const file = this.files[0];
-      const preview = document.getElementById('photoPreview');
-      const errorDiv = document.getElementById('photo-error');
-      
-      if (file) {
-        // Check file size (200KB = 204800 bytes)
-        if (file.size > 204800) {
-          showValidationIcon('photo', false);
-          errorDiv.textContent = 'Photo size must be less than 200KB';
-          errorDiv.style.display = 'block';
-          preview.style.display = 'none';
-        } else {
-          showValidationIcon('photo', true);
-          errorDiv.style.display = 'none';
-          
-          // Show preview
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-          };
-          reader.readAsDataURL(file);
-        }
-      } else {
-        hideValidationIcon('photo');
+      if (file.size > maxSize) {
+        indicator.innerHTML = '●';
+        indicator.className = 'validation-indicator error';
+        indicator.title = 'Photo size must be 200KB or less';
         preview.style.display = 'none';
+        return false;
+      } else {
+        indicator.innerHTML = '✓';
+        indicator.className = 'validation-indicator success';
+        indicator.title = '';
+        
+        // Show photo preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+        return true;
       }
-    });
+    } else {
+      indicator.innerHTML = '';
+      indicator.className = 'validation-indicator';
+      preview.style.display = 'none';
+      return false;
+    }
+  }
 
-    // Form submission
-    document.getElementById('registrationForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const submitBtn = document.getElementById('submitBtn');
-      const successDiv = document.getElementById('success-message');
-      const errorDiv = document.getElementById('general-error');
-      
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Registering...';
-      
-      const formData = new FormData(this);
-      
-      fetch('/register', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          successDiv.textContent = data.message;
-          successDiv.style.display = 'block';
-          errorDiv.style.display = 'none';
-          this.reset();
-          // Hide all validation icons
-          document.querySelectorAll('.validation-icon').forEach(icon => {
-            icon.textContent = '';
-            icon.className = 'validation-icon';
-          });
-          document.getElementById('photoPreview').style.display = 'none';
-        } else {
-          errorDiv.textContent = data.message;
-          errorDiv.style.display = 'block';
-          successDiv.style.display = 'none';
-        }
-      })
-      .catch(error => {
-        errorDiv.textContent = 'An unexpected error occurred. Please try again.';
-        errorDiv.style.display = 'block';
-        successDiv.style.display = 'none';
-      })
-      .finally(() => {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Register';
-      });
+  // Initialize country dropdown
+  function initializeCountries() {
+    const nationalitySelect = document.getElementById('playerNationality');
+    countries.forEach(country => {
+      const option = document.createElement('option');
+      option.value = country.toLowerCase().replace(/\s+/g, '-');
+      option.textContent = country;
+      nationalitySelect.appendChild(option);
     });
-  </script>
+  }
+
+  // Show preferred positions based on category selection
+  function showPreferredPositions() {
+    const category = document.getElementById('preferredPositionCategory').value;
+    const optionsDiv = document.getElementById('preferredPositionOptions');
+    const positionSelect = document.getElementById('preferredPosition');
+    
+    if (category) {
+      optionsDiv.classList.remove('hidden');
+      positionSelect.innerHTML = '<option value="">Select Position</option>';
+      
+      positions[category].forEach(position => {
+        const option = document.createElement('option');
+        option.value = position.value;
+        option.textContent = position.text;
+        positionSelect.appendChild(option);
+      });
+    } else {
+      optionsDiv.classList.add('hidden');
+    }
+  }
+
+  // Toggle other positions dropdown
+  function toggleOtherPositionsDropdown() {
+    const panel = document.getElementById('otherPositionsPanel');
+    const arrow = document.getElementById('dropdownArrow');
+    
+    if (panel.classList.contains('hidden')) {
+      panel.classList.remove('hidden');
+      arrow.classList.add('open');
+    } else {
+      panel.classList.add('hidden');
+      arrow.classList.remove('open');
+    }
+  }
+
+  // Update other positions display
+  function updateOtherPositionsDisplay() {
+    const checkboxes = document.querySelectorAll('input[name="otherPositions"]:checked');
+    const display = document.getElementById('otherPositionsDisplay');
+    
+    if (checkboxes.length === 0) {
+      display.textContent = 'Click to select positions';
+    } else if (checkboxes.length === 1) {
+      display.textContent = checkboxes[0].value;
+    } else {
+      display.textContent = `${checkboxes.length} positions selected`;
+    }
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(event) {
+    const dropdown = document.querySelector('.other-positions-dropdown');
+    const panel = document.getElementById('otherPositionsPanel');
+    const arrow = document.getElementById('dropdownArrow');
+    
+    if (!dropdown.contains(event.target)) {
+      panel.classList.add('hidden');
+      arrow.classList.remove('open');
+    }
+  });
+
+  // Handle club selection and show custom field if "Not Available" is selected
+  function handleClubSelection(selectId) {
+    const selectElement = document.getElementById(selectId);
+    const customClubField = document.getElementById('customClubField');
+    
+    if (selectElement.value === 'not-available') {
+      // Show custom club input field
+      customClubField.classList.remove('hidden');
+      document.getElementById('customClub').setAttribute('required', 'required');
+    } else {
+      // Hide custom club input field
+      customClubField.classList.add('hidden');
+      document.getElementById('customClub').removeAttribute('required');
+    }
+  }
+
+  function displayFields() {
+    const userType = document.getElementById('userType').value;
+    document.querySelectorAll('.user-fields').forEach(field => field.classList.add('hidden'));
+    
+    if (userType === 'player') {
+      document.getElementById('playerFields').classList.remove('hidden');
+      // Set required attributes for player fields
+      document.getElementById('firstName').setAttribute('required', 'required');
+      document.getElementById('lastName').setAttribute('required', 'required');
+      document.getElementById('email').setAttribute('required', 'required');
+      document.getElementById('password').setAttribute('required', 'required');
+      document.getElementById('confirmPassword').setAttribute('required', 'required');
+      document.getElementById('dob').setAttribute('required', 'required');
+      document.getElementById('gender').setAttribute('required', 'required');
+      document.getElementById('playerNationality').setAttribute('required', 'required');
+      document.getElementById('playerPhoto').setAttribute('required', 'required');
+      document.getElementById('preferredPositionCategory').setAttribute('required', 'required');
+      document.getElementById('dominantFoot').setAttribute('required', 'required');
+      document.getElementById('height').setAttribute('required', 'required');
+      document.getElementById('weight').setAttribute('required', 'required');
+      document.getElementById('league').setAttribute('required', 'required');
+    } else if (userType === 'club') {
+      document.getElementById('clubFields').classList.remove('hidden');
+    } else if (userType === 'scout') {
+      document.getElementById('scoutFields').classList.remove('hidden');
+    }
+  }
+
+  function handleLeagueChange() {
+    const league = document.getElementById('league').value;
+    const leagueClubDropdown = document.getElementById('leagueClubDropdown');
+    const generalClubDropdown = document.getElementById('generalClubDropdown');
+    const leagueClubSelect = document.getElementById('leagueClub');
+    const generalClubSelect = document.getElementById('generalClub');
+    const dobField = document.getElementById('dobField');
+    const customClubField = document.getElementById('customClubField');
+
+    // Hide all club-related dropdowns first
+    leagueClubDropdown.classList.add('hidden');
+    generalClubDropdown.classList.add('hidden');
+    customClubField.classList.add('hidden');
+    
+    // Clear previous options and remove required attributes
+    leagueClubSelect.innerHTML = '<option value="">Select Club/Team</option>';
+    generalClubSelect.innerHTML = '<option value="">Select Club/Team</option>';
+    leagueClubSelect.removeAttribute('required');
+    generalClubSelect.removeAttribute('required');
+    document.getElementById('customClub').removeAttribute('required');
+
+    // Handle age field visibility based on league
+    if (league === 'street' || league === 'university' || league === 'nnl2') {
+      // Hide age field for these leagues
+      dobField.classList.add('hidden');
+      document.getElementById('dob').removeAttribute('required');
+    } else {
+      // Show age field for NPFL, NNL1, and Academy
+      dobField.classList.remove('hidden');
+      document.getElementById('dob').setAttribute('required', 'required');
+    }
+
+    if (league === 'npfl' || league === 'nnl1' || league === 'nnl2' || league === 'academy') {
+      // Show league-specific clubs
+      leagueClubDropdown.classList.remove('hidden');
+      const clubs = leagueClubs[league] || [];
+      clubs.forEach(club => {
+        const option = document.createElement('option');
+        option.value = club.toLowerCase().replace(/\s+/g, '-');
+        option.textContent = club;
+        leagueClubSelect.appendChild(option);
+      });
+      
+      leagueClubSelect.setAttribute('required', 'required');
+    } else if (league === 'street' || league === 'university') {
+      // Show general clubs dropdown
+      generalClubDropdown.classList.remove('hidden');
+      generalClubs.forEach(club => {
+        const option = document.createElement('option');
+        option.value = club.toLowerCase().replace(/\s+/g, '-');
+        option.textContent = club;
+        generalClubSelect.appendChild(option);
+      });
+      
+      // Add "Not Available" option for street and university
+      const notAvailableOption = document.createElement('option');
+      notAvailableOption.value = 'not-available';
+      notAvailableOption.textContent = 'Not Available';
+      generalClubSelect.appendChild(notAvailableOption);
+      
+      generalClubSelect.setAttribute('required', 'required');
+    }
+  }
+
+  // Form submission handler
+  document.getElementById('registrationForm').addEventListener('submit', function(e) {
+    const userType = document.getElementById('userType').value;
+    
+    if (userType === 'club' || userType === 'scout') {
+      e.preventDefault();
+      showMessage(`${userType.charAt(0).toUpperCase() + userType.slice(1)} registration coming soon!`, true);
+      return false;
+    }
+    
+    // Additional validation for player registration
+    if (userType === 'player') {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (password !== confirmPassword) {
+        e.preventDefault();
+        showMessage("Passwords do not match", true);
+        return false;
+      }
+      
+      if (password.length < 6) {
+        e.preventDefault();
+        showMessage("Password must be at least 6 characters long", true);
+        return false;
+      }
+      
+      // Validate photo size
+      const photoInput = document.getElementById('playerPhoto');
+      if (photoInput.files.length > 0) {
+        const file = photoInput.files[0];
+        const maxSize = 200 * 1024; // 200KB
+        if (file.size > maxSize) {
+          e.preventDefault();
+          showMessage("Photo size must be 200KB or less", true);
+          return false;
+        }
+      }
+    }
+  });
+
+  // Initialize dropdowns when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeCountries();
+    document.getElementById('year').textContent = new Date().getFullYear();
+  });
+</script>
 </body>
 </html>
