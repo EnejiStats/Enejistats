@@ -214,13 +214,12 @@
 <main>
   <h2>User Registration</h2>
   <div id="messageArea">
-    {% if message %}
-      <div class="error-message">{{ message }}</div>
-    {% endif %}
-    {% if success %}
-      <div class="success-message">Registration successful!</div>
-    {% endif %}
-  </div>
+  {% if error %}
+    <div class="error-message">{{ error }}</div>
+  {% elif success %}
+    <div class="success-message">{{ success }}</div>
+  {% endif %}
+</div>
   <form id="registrationForm" action="/register" method="post" enctype="multipart/form-data">
     <label for="userType">User Type</label>
     <select id="userType" name="userType" onchange="displayFields()" required>
