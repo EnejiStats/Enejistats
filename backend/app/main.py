@@ -1,8 +1,10 @@
+
 import os
 from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException, Response, Cookie
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.requests import Request
 from typing import Optional, List
 from pydantic import BaseModel
 import json
@@ -30,7 +32,7 @@ uploads_dir = Path("static/uploads")
 uploads_dir.mkdir(parents=True, exist_ok=True)
 
 # JWT Configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")  # Use env variable in production
+SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
@@ -91,9 +93,9 @@ def save_to_json(data):
             registrations = json.load(f)
     else:
         registrations = []
-
+    
     registrations.append(data)
-
+    
     with open(registrations_file, "w") as f:
         json.dump(registrations, f, indent=2)
 
@@ -105,7 +107,6 @@ async def home(request: Request):
     try:
         return templates.TemplateResponse("index.html", {"request": request})
     except Exception:
-        # Fallback to registration form if index.html doesn't exist
         try:
             return templates.TemplateResponse("register.html", {"request": request})
         except Exception:
@@ -171,7 +172,6 @@ async def get_login(request: Request, access_token: str = Cookie(None)):
 @app.get("/player-dashboard", response_class=HTMLResponse)
 async def player_dashboard(request: Request):
     """Serve the player dashboard page with session check"""
-    # Note: This would need proper session management implementation
     return templates.TemplateResponse("player-dashboard.html", {"request": request})
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -253,14 +253,13 @@ async def get_registrations():
             return {"registrations": registrations, "source": "mongodb"}
         except Exception as e:
             print(f"MongoDB query error: {e}")
-
-    # Fallback to JSON file
+    
     registrations_file = Path("registrations.json")
     if registrations_file.exists():
         with open(registrations_file, "r") as f:
             registrations = json.load(f)
         return {"registrations": registrations, "source": "json"}
-
+    
     return {"registrations": [], "source": "none"}
 
 @app.post("/login")
@@ -292,7 +291,6 @@ async def post_login(
             "message": "Invalid email or password."
         })
 
-    # Create JWT token and set cookie
     token = create_access_token({"sub": str(user["_id"])})
     res = RedirectResponse(url="/dashboard", status_code=302)
     res.set_cookie("access_token", token, httponly=True, max_age=3600)
@@ -311,13 +309,13 @@ async def submit_contact(
         "email": email,
         "message": message
     }
-
+    
     if contact_collection:
         try:
             contact_collection.insert_one(contact_data)
         except Exception as e:
             print(f"Failed to save contact message: {e}")
-
+    
     return templates.TemplateResponse("contact.html", {"request": request, "success": True})
 
 @app.post("/register")
@@ -354,11 +352,13 @@ async def register_user(
     photo_url: Optional[str] = Form(None)
 ):
     """Handle both web form registration and API registration"""
-
+    
     try:
+        # Check if this is an API call
         is_api_call = bool(player_id and first_name and last_name)
-
+        
         if is_api_call:
+            # Handle API registration
             new_player = {
                 "player_id": player_id,
                 "first_name": first_name,
@@ -371,42 +371,34 @@ async def register_user(
                 "club": club,
                 "photo_url": photo_url
             }
-
-            if players_collection:
-                try:
+            
+            try:
+                if players_collection:
                     players_collection.insert_one(new_player.copy())
-                except Exception as e:
-                    print(f"Failed to save player: {e}")
+                else:
                     save_to_json(new_player)
-            else:
-                save_to_json(new_player)
-
-            return JSONResponse(content={"success": True, "message": "Player registered via API."})
-
+                
+                return JSONResponse(content={
+                    "success": True, 
+                    "message": "Player registered successfully via API",
+                    "player": new_player
+                })
+            except Exception as e:
+                print(f"API registration error: {e}")
+                return JSONResponse(content={
+                    "success": False,
+                    "message": f"Registration failed: {str(e)}"
+                }, status_code=500)
+        
+        # Handle web form registration
         if userType not in ["player", "club", "scout"]:
             return templates.TemplateResponse("register.html", {
                 "request": request,
-                "message": "Invalid user type"
+                "error": "Invalid user type selected"
             })
-
+        
         if userType == "player":
-            # Validate email format
-            if email:
-                import re
-                email_pattern = r'^[^@]+@[^@]+\.[^@]+$'
-                if not re.match(email_pattern, email):
-                    return templates.TemplateResponse("register.html", {
-                        "request": request,
-                        "message": "Please enter a valid email address."
-                    })
-
-            # Validate password length
-            if password and len(password) < 6:
-                return templates.TemplateResponse("register.html", {
-                    "request": request,
-                        "message": "Password must be at least 6 characters long."
-                    })
-
+            # Validate required fields
             required_fields = {
                 "firstName": firstName,
                 "lastName": lastName,
@@ -423,49 +415,63 @@ async def register_user(
                 "league": league,
                 "clubAssociation": clubAssociation
             }
-
+            
             missing_fields = [field for field, value in required_fields.items() if not value]
             if missing_fields:
                 return templates.TemplateResponse("register.html", {
                     "request": request,
-                        "message": f"Missing required fields: {', '.join(missing_fields)}"
-                    })
-
-            # Check if user with email already exists
+                    "error": f"Missing required fields: {', '.join(missing_fields)}"
+                })
+            
+            # Check if email already exists
             if players_collection:
                 existing_user = players_collection.find_one({"email": email})
                 if existing_user:
                     return templates.TemplateResponse("register.html", {
                         "request": request,
-                        "message": "A user with this email already exists."
+                        "error": "Email already registered"
                     })
-
+            
+            # Handle photo upload
             photo_filename = None
             if playerPhoto and playerPhoto.filename:
-                content = await playerPhoto.read()
-                if len(content) > 20 * 1024:
+                try:
+                    content = await playerPhoto.read()
+                    if len(content) > 20 * 1024:  # 20KB limit
+                        return templates.TemplateResponse("register.html", {
+                            "request": request,
+                            "error": "Photo size must be 20KB or less"
+                        })
+                    
+                    photo_filename = f"{firstName.lower()}_{lastName.lower()}.jpg"
+                    file_path = uploads_dir / photo_filename
+                    with open(file_path, "wb") as buffer:
+                        buffer.write(content)
+                except Exception as e:
+                    print(f"Photo upload error: {e}")
                     return templates.TemplateResponse("register.html", {
                         "request": request,
-                        "message": "Photo size must be 20KB or less"
+                        "error": "Failed to upload photo"
                     })
-
-                if firstName and lastName:
-                    import time
-                    timestamp = int(time.time())
-                    photo_filename = f"{firstName.lower()}_{lastName.lower()}_{timestamp}.jpg"
-                else:
-                    photo_filename = f"{email}_{playerPhoto.filename}"
-
-                file_path = uploads_dir / photo_filename
-                with open(file_path, "wb") as buffer:
-                    buffer.write(content)
-
-            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            
+            # Hash password
+            try:
+                hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            except Exception as e:
+                print(f"Password hashing error: {e}")
+                return templates.TemplateResponse("register.html", {
+                    "request": request,
+                    "error": "Password processing failed"
+                })
+            
+            # Determine selected club
             selected_club = leagueClub or generalClub or club
-
+            
+            # Prepare registration data
             registration_data = {
+                "userType": userType,
                 "firstName": firstName,
-                "middleName": middleName or "",
+                "middleName": middleName,
                 "lastName": lastName,
                 "email": email,
                 "password": hashed_password,
@@ -477,40 +483,45 @@ async def register_user(
                 "preferredPosition": preferredPosition,
                 "otherPositions": otherPositions or [],
                 "dominantFoot": dominantFoot,
-                "height": int(height) if height else None,
-                "weight": int(weight) if weight else None,
+                "height": height,
+                "weight": weight,
                 "league": league,
                 "club": selected_club,
-                "clubAssociation": clubAssociation,
-                "created_at": datetime.utcnow()
+                "clubAssociation": clubAssociation
             }
-
-            # Remove None values
-            clean_data = {k: v for k, v in registration_data.items() if v is not None}
-
-            if players_collection:
-                try:
+            
+            # Save to database
+            try:
+                if players_collection:
+                    clean_data = {k: v for k, v in registration_data.items() if v is not None and k != 'userType'}
                     players_collection.insert_one(clean_data)
-                    return RedirectResponse(url="/success", status_code=303)
-                except Exception as e:
-                    print(f"MongoDB error: {e}")
-                    save_to_json(clean_data)
-                    return RedirectResponse(url="/success", status_code=303)
-            else:
-                save_to_json(clean_data)
+                else:
+                    save_to_json(registration_data)
+                
                 return RedirectResponse(url="/success", status_code=303)
-
-        # For club and scout registration
-        return templates.TemplateResponse("register.html", {
-            "request": request,
-            "message": f"{userType.title()} registration coming soon!"
-        })
-
+            except Exception as e:
+                print(f"Database save error: {e}")
+                try:
+                    save_to_json(registration_data)
+                    return RedirectResponse(url="/success", status_code=303)
+                except Exception as json_error:
+                    print(f"JSON fallback error: {json_error}")
+                    return templates.TemplateResponse("register.html", {
+                        "request": request,
+                        "error": "Registration failed. Please try again."
+                    })
+        else:
+            # Other user types not implemented yet
+            return templates.TemplateResponse("register.html", {
+                "request": request,
+                "error": f"{userType.title()} registration coming soon!"
+            })
+    
     except Exception as e:
         print(f"Registration error: {str(e)}")
         return templates.TemplateResponse("register.html", {
             "request": request,
-            "message": "An error occurred during registration. Please try again."
+            "error": "An unexpected error occurred. Please try again."
         })
 
 @app.post("/validate-player")
