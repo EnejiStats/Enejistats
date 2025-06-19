@@ -694,6 +694,12 @@
     "Michael Okpara University FC", "University of Calabar FC", "Rivers State University FC"
   ];
 
+  // Simulated registered users database (in real implementation, this would be server-side)
+  const registeredUsers = [
+    { firstName: "John", lastName: "Doe", email: "john.doe@example.com" },
+    { firstName: "Jane", lastName: "Smith", email: "jane.smith@example.com" }
+  ];
+
   function showMessage(message, isError = false) {
     const messageArea = document.getElementById('messageArea');
     messageArea.innerHTML = `<div class="${isError ? 'error-message' : 'success-message'}">${message}</div>`;
@@ -721,12 +727,38 @@
       case 'lastName':
         isValid = value.length >= 2;
         if (!isValid) errorMessage = 'Name must be at least 2 characters';
+        if (isValid) {
+          // Check for duplicate user
+          const otherName = fieldId === 'firstName' ? 
+            document.getElementById('lastName').value.trim() :
+            document.getElementById('firstName').value.trim();
+          const email = document.getElementById('email').value.trim();
+          
+          if (otherName && checkDuplicateUser(
+            fieldId === 'firstName' ? value : otherName,
+            fieldId === 'lastName' ? value : otherName,
+            email
+          )) {
+            isValid = false;
+            errorMessage = 'User with this name already exists';
+          }
+        }
         break;
       
       case 'email':
         const emailPattern = /^[^@]+@[^@]+\.[^@]+$/;
         isValid = emailPattern.test(value);
         if (!isValid) errorMessage = 'Please enter a valid email address';
+        if (isValid) {
+          // Check for duplicate email
+          const firstName = document.getElementById('firstName').value.trim();
+          const lastName = document.getElementById('lastName').value.trim();
+          
+          if (checkDuplicateUser(firstName, lastName, value)) {
+            isValid = false;
+            errorMessage = 'User with this email already exists';
+          }
+        }
         break;
       
       case 'password':
@@ -781,6 +813,14 @@
     }
 
     return isValid;
+  }
+
+  function checkDuplicateUser(firstName, lastName, email) {
+    return registeredUsers.some(user => 
+      (user.firstName.toLowerCase() === firstName.toLowerCase() && 
+       user.lastName.toLowerCase() === lastName.toLowerCase()) ||
+      user.email.toLowerCase() === email.toLowerCase()
+    );
   }
 
   function validatePhoto() {
@@ -1000,45 +1040,69 @@
     }
   }
 
+  function validateAuthFields() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const confirmPassword = document.getElementById("confirmPassword").value.trim();
+    const emailPattern = /^[^@]+@[^@]+\.[^@]+$/;
+    
+    if (!emailPattern.test(email)) {
+      showMessage("Please enter a valid email address.", true);
+      return false;
+    }
+    if (password.length < 6) {
+      showMessage("Password must be at least 6 characters long.", true);
+      return false;
+    }
+    if (password !== confirmPassword) {
+      showMessage("Passwords do not match.", true);
+      return false;
+    }
+    return true;
+  }
+
+  function validatePhotoSize() {
+    const photoInput = document.getElementById('playerPhoto');
+    if (photoInput.files.length > 0) {
+      const file = photoInput.files[0];
+      const maxSize = 200 * 1024; // 200KB in bytes
+      if (file.size > maxSize) {
+        showMessage("Photo size must be 200KB or less.", true);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function checkForDuplicateRegistration() {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    
+    if (checkDuplicateUser(firstName, lastName, email)) {
+      showMessage("A user with these credentials is already registered.", true);
+      return false;
+    }
+    return true;
+  }
+
   // Form submission handler
   document.getElementById('registrationForm').addEventListener('submit', function(e) {
     const userType = document.getElementById('userType').value;
     
-    if (userType === 'club' || userType === 'scout') {
+    if (userType === 'player') {
+      if (!validateAuthFields() || !validatePhotoSize() || !checkForDuplicateRegistration()) {
+        e.preventDefault();
+        return false;
+      }
+    } else if (userType === 'club' || userType === 'scout') {
       e.preventDefault();
       showMessage(`${userType.charAt(0).toUpperCase() + userType.slice(1)} registration coming soon!`, true);
       return false;
     }
     
-    // Additional validation for player registration
-    if (userType === 'player') {
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      
-      if (password !== confirmPassword) {
-        e.preventDefault();
-        showMessage("Passwords do not match", true);
-        return false;
-      }
-      
-      if (password.length < 6) {
-        e.preventDefault();
-        showMessage("Password must be at least 6 characters long", true);
-        return false;
-      }
-      
-      // Validate photo size
-      const photoInput = document.getElementById('playerPhoto');
-      if (photoInput.files.length > 0) {
-        const file = photoInput.files[0];
-        const maxSize = 200 * 1024; // 200KB
-        if (file.size > maxSize) {
-          e.preventDefault();
-          showMessage("Photo size must be 200KB or less", true);
-          return false;
-        }
-      }
-    }
+    // For player registration, let the form submit normally
+    showMessage("Submitting registration...");
   });
 
   // Initialize dropdowns when page loads
