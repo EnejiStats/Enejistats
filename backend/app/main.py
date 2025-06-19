@@ -143,16 +143,20 @@ async def stats(request: Request):
     return templates.TemplateResponse("stats_area.html", {"request": request})
 
 @app.get("/player", response_class=HTMLResponse)
-async def player_entry(request: Request, access_token: str = Cookie(None)):
-    """Redirect to dashboard if logged in, otherwise show login/register options."""
-    if access_token and verify_token(access_token):
-        return RedirectResponse(url="/dashboard", status_code=302)
+async def player(request: Request):
+    """Serve the player page"""
     return templates.TemplateResponse("player.html", {"request": request})
-    
+
 @app.get("/stats/browse", response_class=HTMLResponse)
 async def stats_browse(request: Request):
     """Serve the stats browse page"""
     return templates.TemplateResponse("browse.html", {"request": request})
+
+@app.get("/stats/player", response_class=HTMLResponse)
+async def stats_player(request: Request):
+    """Serve the stats player page"""
+    return templates.TemplateResponse("player.html", {"request": request})
+
 
 @app.get("/register", response_class=HTMLResponse)
 async def get_register_form(request: Request):
