@@ -147,7 +147,9 @@ async def player_entry(request: Request, access_token: str = Cookie(None)):
     """Redirect to dashboard if logged in, otherwise show login/register options."""
     if access_token and verify_token(access_token):
         return RedirectResponse(url="/dashboard", status_code=302)
-    return templates.TemplateResponse("player.html", {"request": request})@app.get("/stats/browse", response_class=HTMLResponse)
+    return templates.TemplateResponse("player.html", {"request": request})
+    
+@app.get("/stats/browse", response_class=HTMLResponse)
 async def stats_browse(request: Request):
     """Serve the stats browse page"""
     return templates.TemplateResponse("browse.html", {"request": request})
