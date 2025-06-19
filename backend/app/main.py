@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException, Res
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.requests import Request
 from typing import Optional, List
 from pydantic import BaseModel
 import json
@@ -476,47 +477,179 @@ async def register_user(
                     "league": league,
                     "club": selected_club,
                     "clubAssociation": clubAssociation
-                }
-                
-                # Save to MongoDB if available, otherwise save to JSON
-                if players_collection:
-                    try:
-                        # Remove userType and None values for database
-                        clean_data = {k: v for k, v in registration_data.items() 
-                                     if v is not None and k != 'userType'}
-                        
-                        players_collection.insert_one(clean_data)
-                        return RedirectResponse(url="/success", status_code=303)
-                        
-                    except Exception as e:
-                        print(f"MongoDB error: {e}")
-                        # Fall back to JSON storage
-                        save_to_json(registration_data)
-                        return JSONResponse(
-                            content={"success": True, "message": "Player registration successful! (Saved to backup)"},
-                            status_code=200
-                        )
+   
+@app.post("/register")
+async def register_user(
+    request: Request,
+    userType: str = Form(...),
+    firstName: Optional[str] = Form(None),
+    middleName: Optional[str] = Form(None),
+    lastName: Optional[str] = Form(None),
+    email: Optional[str] = Form(None),
+    password: Optional[str] = Form(None),
+    dob: Optional[str] = Form(None),
+    gender: Optional[str] = Form(None),
+    playerNationality: Optional[str] = Form(None),
+    playerPhoto: Optional[UploadFile] = File(None),
+    preferredPositionCategory: Optional[str] = Form(None),
+    preferredPosition: Optional[str] = Form(None),
+    otherPositions: Optional[List[str]] = Form(None),
+    dominantFoot: Optional[str] = Form(None),
+    height: Optional[int] = Form(None),
+    weight: Optional[int] = Form(None),
+    league: Optional[str] = Form(None),
+    leagueClub: Optional[str] = Form(None),
+    generalClub: Optional[str] = Form(None),
+    clubAssociation: Optional[str] = Form(None),
+    club: Optional[str] = Form(None),
+    player_id: Optional[str] = Form(None),
+    first_name: Optional[str] = Form(None),
+    middle_name: Optional[str] = Form(None),
+    last_name: Optional[str] = Form(None),
+    nationality: Optional[str] = Form(None),
+    preferred_position_category: Optional[str] = Form(None),
+    preferred_position: Optional[str] = Form(None),
+    photo_url: Optional[str] = Form(None)
+):
+    """Handle both web form registration and API registration"""
+
+    async def respond(content: dict, status_code: int = 200, redirect: Optional[str] = None):
+        """Helper to return JSON or redirect depending on request type"""
+        if "application/json" in request.headers.get("accept", "").lower():
+            return JSONResponse(content=content, status_code=status_code)
+        elif redirect:
+            return RedirectResponse(url=redirect, status_code=status_code)
+        return JSONResponse(content=content, status_code=status_code)
+
+    try:
+        is_api_call = bool(player_id and first_name and last_name)
+
+        if is_api_call:
+            new_player = {
+                "player_id": player_id,
+                "first_name": first_name,
+                "middle_name": middle_name or "",
+                "last_name": last_name,
+                "dob": dob,
+                "nationality": nationality,
+                "preferred_position_category": preferred_position_category,
+                "preferred_position": preferred_position,
+                "club": club,
+                "photo_url": photo_url
+            }
+
+            if players_collection:
+                try:
+                    players_collection.insert_one(new_player.copy())
+                except Exception as e:
+                    print(f"Failed to save player: {e}")
+                    save_to_json(new_player)
+            else:
+                save_to_json(new_player)
+
+            return await respond({"success": True, "message": "Player registered via API."})
+
+        if userType not in ["player", "club", "scout"]:
+            return await respond({"success": False, "message": "Invalid user type"}, status_code=400)
+
+        if userType == "player":
+            required_fields = {
+                "firstName": firstName,
+                "lastName": lastName,
+                "email": email,
+                "password": password,
+                "dob": dob,
+                "gender": gender,
+                "playerNationality": playerNationality,
+                "preferredPositionCategory": preferredPositionCategory,
+                "preferredPosition": preferredPosition,
+                "dominantFoot": dominantFoot,
+                "height": height,
+                "weight": weight,
+                "league": league,
+                "clubAssociation": clubAssociation
+            }
+
+            missing_fields = [field for field, value in required_fields.items() if not value]
+            if missing_fields:
+                return await respond({
+                    "success": False,
+                    "message": f"Missing required fields: {', '.join(missing_fields)}"
+                }, status_code=400)
+
+            photo_filename = None
+            if playerPhoto and playerPhoto.filename:
+                content = await playerPhoto.read()
+                if len(content) > 20 * 1024:
+                    return await respond({
+                        "success": False,
+                        "message": "Photo size must be 20KB or less"
+                    }, status_code=400)
+
+                if firstName and lastName:
+                    photo_filename = f"{firstName.lower()}_{lastName.lower()}.jpg"
                 else:
-                    # Save to JSON file
+                    photo_filename = f"{email}_{playerPhoto.filename}"
+                
+                file_path = uploads_dir / photo_filename
+                with open(file_path, "wb") as buffer:
+                    buffer.write(content)
+
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            selected_club = leagueClub or generalClub or club
+
+            registration_data = {
+                "userType": userType,
+                "firstName": firstName,
+                "middleName": middleName,
+                "lastName": lastName,
+                "email": email,
+                "password": hashed_password,
+                "dob": dob,
+                "gender": gender,
+                "nationality": playerNationality,
+                "photo": photo_filename,
+                "preferredPositionCategory": preferredPositionCategory,
+                "preferredPosition": preferredPosition,
+                "otherPositions": otherPositions or [],
+                "dominantFoot": dominantFoot,
+                "height": height,
+                "weight": weight,
+                "league": league,
+                "club": selected_club,
+                "clubAssociation": clubAssociation
+            }
+
+            if players_collection:
+                try:
+                    clean_data = {k: v for k, v in registration_data.items() if v is not None and k != 'userType'}
+                    players_collection.insert_one(clean_data)
+                    return await respond({"success": True, "message": "Player registered"}, redirect="/success", status_code=303)
+                except Exception as e:
+                    print(f"MongoDB error: {e}")
                     save_to_json(registration_data)
-                    return JSONResponse(
-                        content={"success": True, "message": "Player registration successful!"},
-                        status_code=200
-                    )
-            
-            # Handle club and scout registrations (coming soon)
-            elif userType in ["club", "scout"]:
-                return JSONResponse(
-                    content={"success": False, "message": f"{userType.title()} registration coming soon!"},
-                    status_code=400
-                )
-        
+                    return await respond({
+                        "success": True,
+                        "message": "Player registered (saved to backup)"
+                    }, status_code=200)
+            else:
+                save_to_json(registration_data)
+                return await respond({
+                    "success": True,
+                    "message": "Player registered (JSON fallback)"
+                }, status_code=200)
+
+        return await respond({
+            "success": False,
+            "message": f"{userType.title()} registration coming soon!"
+        }, status_code=400)
+
     except Exception as e:
         print(f"Registration error: {str(e)}")
-        return JSONResponse(
-            content={"success": False, "message": "An error occurred during registration"},
-            status_code=500
-        )
+        return await respond({
+            "success": False,
+            "message": "An error occurred during registration"
+        }, status_code=500)
 
 @app.post("/validate-player")
 async def validate(player: Player):
