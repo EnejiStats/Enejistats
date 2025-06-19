@@ -142,18 +142,14 @@ async def stats(request: Request):
     """Serve the stats page"""
     return templates.TemplateResponse("stats_area.html", {"request": request})
 
-@app.get("/stats_player", response_class=HTMLResponse)
-async def player(request: Request):
-    """Serve the player page"""
-    return templates.TemplateResponse("player.html", {"request": request})
-
-
 @app.get("/player", response_class=HTMLResponse)
-async def player_entry(request: Request, access_token: str = Cookie(None)):
-    """Redirect to dashboard if logged in, otherwise show login/register options."""
-    if access_token and verify_token(access_token):
-        return RedirectResponse(url="/dashboard", status_code=302)
-    return templates.TemplateResponse("player.html", {"request": request})
+async def player_entry_debug(request: Request, access_token: str = Cookie(None)):
+    try:
+        if access_token and verify_token(access_token):
+            return RedirectResponse(url="/dashboard", status_code=302)
+        return templates.TemplateResponse("player.html", {"request": request})
+    except Exception as e:
+        return HTMLResponse(f"<h1>Error loading player.html</h1><p>{str(e)}</p>", status_code=500)
 
 @app.get("/stats/player", response_class=HTMLResponse)
 async def stats_player(request: Request):
