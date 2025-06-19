@@ -1,8 +1,14 @@
-# Ignore environment files
+# Environment variables
 .env
 
-# Ignore Python cache and virtual environment
+# Python cache
 __pycache__/
 *.pyc
-venv/
-env/
+
+# VS Code or IDE configs
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
