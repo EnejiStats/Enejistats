@@ -4,7 +4,6 @@ from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException, Res
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from fastapi.requests import Request
 from typing import Optional, List
 from pydantic import BaseModel
 import json
@@ -157,7 +156,6 @@ async def stats_browse(request: Request):
 async def stats_player(request: Request):
     """Serve the stats player page"""
     return templates.TemplateResponse("player.html", {"request": request})
-
 
 @app.get("/register", response_class=HTMLResponse)
 async def get_register_form(request: Request):
@@ -323,161 +321,6 @@ async def submit_contact(
     
     return templates.TemplateResponse("contact.html", {"request": request, "success": True})
 
-@app.post("/register")
-async def register_user(
-    request: Request,
-    userType: str = Form(...),
-    # Player fields for web form registration
-    firstName: Optional[str] = Form(None),
-    middleName: Optional[str] = Form(None),
-    lastName: Optional[str] = Form(None),
-    email: Optional[str] = Form(None),
-    password: Optional[str] = Form(None),
-    dob: Optional[str] = Form(None),
-    gender: Optional[str] = Form(None),
-    playerNationality: Optional[str] = Form(None),
-    playerPhoto: Optional[UploadFile] = File(None),
-    preferredPositionCategory: Optional[str] = Form(None),
-    preferredPosition: Optional[str] = Form(None),
-    otherPositions: Optional[List[str]] = Form(None),
-    dominantFoot: Optional[str] = Form(None),
-    height: Optional[int] = Form(None),
-    weight: Optional[int] = Form(None),
-    league: Optional[str] = Form(None),
-    leagueClub: Optional[str] = Form(None),
-    generalClub: Optional[str] = Form(None),
-    clubAssociation: Optional[str] = Form(None),
-    club: Optional[str] = Form(None),
-    # API fields for Pydantic validation
-    player_id: Optional[str] = Form(None),
-    first_name: Optional[str] = Form(None),
-    middle_name: Optional[str] = Form(None),
-    last_name: Optional[str] = Form(None),
-    nationality: Optional[str] = Form(None),
-    preferred_position_category: Optional[str] = Form(None),
-    preferred_position: Optional[str] = Form(None),
-    photo_url: Optional[str] = Form(None)
-):
-    """Handle both web form registration and API registration"""
-    
-    try:
-        # Determine if this is an API call or web form submission
-        is_api_call = bool(player_id and first_name and last_name)
-        
-        if is_api_call:
-            # Handle API registration with Pydantic validation
-            new_player = {
-                "player_id": player_id,
-                "first_name": first_name,
-                "middle_name": middle_name or "",
-                "last_name": last_name,
-                "dob": dob,
-                "nationality": nationality,
-                "preferred_position_category": preferred_position_category,
-                "preferred_position": preferred_position,
-                "club": club,
-                "photo_url": photo_url
-            }
-            
-            if players_collection:
-                try:
-                    players_collection.insert_one(new_player.copy())
-                except Exception as e:
-                    print(f"Failed to save player: {e}")
-                    save_to_json(new_player)
-            else:
-                save_to_json(new_player)
-            
-            return new_player
-        
-        else:
-            # Handle web form registration
-            # Basic validation
-            if userType not in ["player", "club", "scout"]:
-                return JSONResponse(
-                    content={"success": False, "message": "Invalid user type"},
-                    status_code=400
-                )
-            
-            # Handle player registration
-            if userType == "player":
-                # Validate required fields
-                required_fields = {
-                    "firstName": firstName,
-                    "lastName": lastName,
-                    "email": email,
-                    "password": password,
-                    "dob": dob,
-                    "gender": gender,
-                    "playerNationality": playerNationality,
-                    "preferredPositionCategory": preferredPositionCategory,
-                    "preferredPosition": preferredPosition,
-                    "dominantFoot": dominantFoot,
-                    "height": height,
-                    "weight": weight,
-                    "league": league,
-                    "clubAssociation": clubAssociation
-                }
-                
-                missing_fields = [field for field, value in required_fields.items() if not value]
-                if missing_fields:
-                    return JSONResponse(
-                        content={"success": False, "message": f"Missing required fields: {', '.join(missing_fields)}"},
-                        status_code=400
-                    )
-                
-                # Handle photo upload
-                photo_filename = None
-                if playerPhoto and playerPhoto.filename:
-                    # Validate file size (20KB limit)
-                    content = await playerPhoto.read()
-                    if len(content) > 20 * 1024:  # 20KB
-                        return JSONResponse(
-                            content={"success": False, "message": "Photo size must be 20KB or less"},
-                            status_code=400
-                        )
-                    
-                    # Generate filename
-                    if firstName and lastName:
-                        photo_filename = f"{firstName.lower()}_{lastName.lower()}.jpg"
-                    else:
-                        photo_filename = f"{email}_{playerPhoto.filename}"
-                    
-                    # Save the file
-                    file_path = uploads_dir / photo_filename
-                    with open(file_path, "wb") as buffer:
-                        buffer.write(content)
-                
-                # Hash password
-                hashed_password = None
-                if password:
-                    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-                
-                # Determine selected club
-                selected_club = leagueClub or generalClub or club
-                
-                # Prepare registration data
-                registration_data = {
-                    "userType": userType,
-                    "firstName": firstName,
-                    "middleName": middleName,
-                    "lastName": lastName,
-                    "email": email,
-                    "password": hashed_password,
-                    "dob": dob,
-                    "gender": gender,
-                    "nationality": playerNationality,
-                    "photo": photo_filename,
-                    "preferredPositionCategory": preferredPositionCategory,
-                    "preferredPosition": preferredPosition,
-                    "otherPositions": otherPositions or [],
-                    "dominantFoot": dominantFoot,
-                    "height": height,
-                    "weight": weight,
-                    "league": league,
-                    "club": selected_club,
-                    "clubAssociation": clubAssociation
-   
 @app.post("/register")
 async def register_user(
     request: Request,
