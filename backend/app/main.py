@@ -181,7 +181,7 @@ async def dashboard(request: Request, access_token: str = Cookie(None)):
     if not user_id:
         return RedirectResponse(url="/login")
 
-    if not players_collection:
+    if players_collection is None:
         return RedirectResponse(url="/login")
 
     user = players_collection.find_one({"_id": ObjectId(user_id)})
@@ -247,7 +247,7 @@ async def registration_success():
 @app.get("/registrations")
 async def get_registrations():
     """Get all registrations (for testing purposes)"""
-    if players_collection:
+    if players_collection is not None:
         try:
             registrations = list(players_collection.find({}, {"_id": 0}))
             return {"registrations": registrations, "source": "mongodb"}
@@ -270,7 +270,7 @@ async def post_login(
     password: str = Form(...)
 ):
     """Handle user login"""
-    if not players_collection:
+    if players_collection is None:
         return templates.TemplateResponse("login.html", {
             "request": request,
             "message": "Database not available."
@@ -311,7 +311,7 @@ async def submit_contact(
         "created_at": datetime.utcnow()
     }
     
-    if contact_collection:
+    if contact_collection is not None:
         try:
             contact_collection.insert_one(contact_data)
         except Exception as e:
@@ -377,7 +377,7 @@ async def register_user(
             }
             
             try:
-                if players_collection:
+                if players_collection is not None:
                     players_collection.insert_one(new_player.copy())
                 else:
                     save_to_json(new_player)
@@ -444,7 +444,7 @@ async def register_user(
                 })
             
             # Check if email already exists
-            if players_collection:
+            if players_collection is not None:
                 existing_user = players_collection.find_one({"email": email})
                 if existing_user:
                     return templates.TemplateResponse("register.html", {
@@ -453,7 +453,7 @@ async def register_user(
                     })
             
             # Check for duplicate user by name and email
-            if players_collection:
+            if players_collection is not None:
                 duplicate_user = players_collection.find_one({
                     "$or": [
                         {"email": email},
@@ -539,7 +539,7 @@ async def register_user(
             
             # Save to database
             try:
-                if players_collection:
+                if players_collection is not None:
                     # Remove None values and userType before saving to MongoDB
                     clean_data = {k: v for k, v in registration_data.items() if v is not None}
                     result = players_collection.insert_one(clean_data)
@@ -583,4 +583,3 @@ async def validate(player: Player):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=5000)
-    
