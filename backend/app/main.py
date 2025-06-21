@@ -56,19 +56,6 @@ else:
     contact_collection = None
     print("Warning: MONGO_URI or SECRET_KEY not set. Using JSON file storage.")
 
-# Pydantic model
-class Player(BaseModel):
-    player_id: str
-    first_name: str
-    middle_name: Optional[str] = ""
-    last_name: str
-    dob: str
-    nationality: str
-    preferred_position_category: str
-    preferred_position: str
-    club: str
-    photo_url: str
-
 # JWT helper functions
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -103,7 +90,7 @@ async def home(request: Request):
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, access_token: str = Cookie(None)):
     if access_token and verify_token(access_token):
-        return RedirectResponse(url="/dashboard", status_code=302)
+        return RedirectResponse(url="/player-dashboard", status_code=302)
     return templates.TemplateResponse("login.html", {"request": request})
 
 @app.post("/login")
@@ -117,7 +104,7 @@ async def post_login(
         user = players_collection.find_one({"email": email})
         if user and bcrypt.checkpw(password.encode(), user["password"].encode()):
             token = create_access_token({"sub": str(user["_id"])})
-            res = RedirectResponse(url="/dashboard", status_code=302)
+            res = RedirectResponse(url="/player-dashboard", status_code=302)
             res.set_cookie("access_token", token, httponly=True, max_age=3600)
             return res
         else:
@@ -131,8 +118,21 @@ async def post_login(
             "message": "Database not available."
         })
 
+@app.get("/player-dashboard", response_class=HTMLResponse)
+async def player_dashboard(request: Request, access_token: str = Cookie(None)):
+    user_id = verify_token(access_token)
+    if not user_id or players_collection is None:
+        return RedirectResponse(url="/login")
+
+    user = players_collection.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        return RedirectResponse(url="/login")
+
+    return templates.TemplateResponse("player-dashboard.html", {"request": request, "player": user})
+
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, access_token: str = Cookie(None)):
+    # Optional: can delete this route if unused
     user_id = verify_token(access_token)
     if not user_id or players_collection is None:
         return RedirectResponse(url="/login")
