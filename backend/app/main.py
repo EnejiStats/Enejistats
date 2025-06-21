@@ -1,18 +1,3 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-
-app = FastAPI()
-
-# Club Dashboard (future or conditional logic)
-@app.get("/club-dashboard", response_class=HTMLResponse)
-async def club_dashboard(request: Request):
-    return templates.TemplateResponse("club-dashboard.html", {"request": request})
-
-# Scout Dashboard (future or conditional logic)
-@app.get("/scout-dashboard", response_class=HTMLResponse)
-async def scout_dashboard(request: Request):
-    return templates.TemplateResponse("scout-dashboard.html", {"request": request})
 
 import os
 from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException, Response, Cookie
