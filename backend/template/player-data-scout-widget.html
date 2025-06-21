@@ -1,0 +1,472 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Player Data Scout Widget (PDSW) | Enejistats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f5f7fa; color: #333; }
+    header, footer { background-color: #1e1e2f; color: white; padding: 1rem; text-align: center; }
+    nav a { color: white; margin: 0 0.75rem; text-decoration: none; font-weight: 500; }
+    .container { max-width: 1100px; margin: 2rem auto; padding: 1rem; }
+    .widget-tabs { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+    .widget-tabs button {
+      padding: 0.5rem 1rem;
+      background-color: #ccc;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .widget-tabs button.active { background-color: #004aad; color: white; }
+    .widget-content { display: none; }
+    .widget-content.active { display: block; }
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .match-setup {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .team-selection {
+      text-align: center;
+    }
+    .vs-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #004aad;
+    }
+    .match-clock {
+      background: linear-gradient(135deg, #004aad, #0066cc);
+      color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .clock-display {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+    .clock-controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .clock-controls button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .start-btn { background-color: #28a745; color: white; }
+    .pause-btn { background-color: #ffc107; color: #333; }
+    .reset-btn { background-color: #dc3545; color: white; }
+    .player-selector {
+      margin-bottom: 2rem;
+    }
+    .player-search {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    .player-search input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .player-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+    .player-option {
+      padding: 0.75rem;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    .player-option:hover {
+      background-color: #f8f9fa;
+    }
+    .selected-player {
+      background: #e8f4fd;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .metric-item {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .metric-item label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .metric-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .metric-btn {
+      width: 30px;
+      height: 30px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .minus-btn { background-color: #dc3545; color: white; }
+    .plus-btn { background-color: #28a745; color: white; }
+    .metric-value {
+      min-width: 40px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .rating-display {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .rating-score {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+    .rating-text {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    .submit-section {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .submit-btn {
+      background-color: #004aad;
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .substitution-section {
+      background: #fff3cd;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+    select, input {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Enejistats</h1>
+  <nav>
+    <a href="/player-dashboard">Dashboard</a>
+    <a href="/stats-area">Stats Area</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout">Logout</a>
+  </nav>
+</header>
+<div class="container">
+  <div class="widget-tabs">
+    <button class="widget-tab active" onclick="switchWidget('onboard')">Player Onboard</button>
+    <button class="widget-tab" onclick="switchWidget('scout')">Data Scout</button>
+  </div>
+
+  <!-- Player Onboard Widget -->
+  <div id="onboard" class="widget-content active">
+    <div class="card">
+      <h3>Player Registration & Management</h3>
+      <iframe src="/register" width="100%" height="800" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <!-- Data Scout Widget -->
+  <div id="scout" class="widget-content">
+    <!-- Match Setup -->
+    <div class="card">
+      <h3>Match Setup</h3>
+      <div style="margin-bottom: 1rem;">
+        <label for="leagueSelect">League:</label>
+        <select id="leagueSelect" onchange="loadTeams()">
+          <option value="">Select League</option>
+        </select>
+      </div>
+      
+      <div class="match-setup">
+        <div class="team-selection">
+          <label for="homeTeam">Home Team:</label>
+          <select id="homeTeam">
+            <option value="">Select Home Team</option>
+          </select>
+        </div>
+        <div class="team-selection">
+          <label for="awayTeam">Away Team:</label>
+          <select id="awayTeam">
+            <option value="">Select Away Team</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 1rem;">
+        <label for="matchDate">Match Date:</label>
+        <input type="date" id="matchDate" value="">
+      </div>
+    </div>
+
+    <!-- Match Clock -->
+    <div class="match-clock">
+      <div class="clock-display" id="clockDisplay">00:00</div>
+      <div>
+        <span id="halfIndicator">First Half</span> | 
+        <span id="extraTimeDisplay">Extra Time: +0</span>
+      </div>
+      <div class="clock-controls">
+        <button id="startBtn" class="start-btn" onclick="startClock()">Start</button>
+        <button id="pauseBtn" class="pause-btn" onclick="pauseClock()" style="display: none;">Pause</button>
+        <button class="reset-btn" onclick="resetClock()">Reset</button>
+        <button onclick="addExtraTime()">Add Extra Time</button>
+      </div>
+    </div>
+
+    <!-- Player Selection -->
+    <div class="card">
+      <h3>Player Selection</h3>
+      <div class="player-selector">
+        <div class="player-search">
+          <input type="text" id="playerSearch" placeholder="Search for player..." oninput="searchPlayers()">
+          <div id="playerDropdown" class="player-dropdown"></div>
+        </div>
+        <div id="selectedPlayerInfo" class="selected-player" style="display: none;">
+          <strong id="selectedPlayerName"></strong> - <span id="selectedPlayerPosition"></span> - <span id="selectedPlayerClub"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="card">
+      <h3>Performance Statistics</h3>
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <label>Goals</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('goals', -1)">-</button>
+            <span class="metric-value" id="goals">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('goals', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Shots On Target</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('shotsOn', -1)">-</button>
+            <span class="metric-value" id="shotsOn">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('shotsOn', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Shots Off Target</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('shotsOff', -1)">-</button>
+            <span class="metric-value" id="shotsOff">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('shotsOff', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Short Passes ✓</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('shortPassesSuccessful', -1)">-</button>
+            <span class="metric-value" id="shortPassesSuccessful">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('shortPassesSuccessful', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Short Passes ❌</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('shortPassesUnsuccessful', -1)">-</button>
+            <span class="metric-value" id="shortPassesUnsuccessful">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('shortPassesUnsuccessful', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Long Passes ✓</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('longPassesSuccessful', -1)">-</button>
+            <span class="metric-value" id="longPassesSuccessful">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('longPassesSuccessful', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Long Passes ❌</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('longPassesUnsuccessful', -1)">-</button>
+            <span class="metric-value" id="longPassesUnsuccessful">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('longPassesUnsuccessful', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Crosses ✓</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('crossesSuccessful', -1)">-</button>
+            <span class="metric-value" id="crossesSuccessful">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('crossesSuccessful', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Crosses ❌</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('crossesUnsuccessful', -1)">-</button>
+            <span class="metric-value" id="crossesUnsuccessful">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('crossesUnsuccessful', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Interceptions</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('interceptions', -1)">-</button>
+            <span class="metric-value" id="interceptions">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('interceptions', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Tackles</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('tackles', -1)">-</button>
+            <span class="metric-value" id="tackles">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('tackles', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Clearances</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('clearances', -1)">-</button>
+            <span class="metric-value" id="clearances">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('clearances', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>GK Saves</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('gkSaves', -1)">-</button>
+            <span class="metric-value" id="gkSaves">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('gkSaves', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Yellow Cards</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('yellowCards', -1)">-</button>
+            <span class="metric-value" id="yellowCards">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('yellowCards', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Red Cards</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('redCards', -1)">-</button>
+            <span class="metric-value" id="redCards">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('redCards', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Fouls</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('fouls', -1)">-</button>
+            <span class="metric-value" id="fouls">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('fouls', 1)">+</button>
+          </div>
+        </div>
+        
+        <div class="metric-item">
+          <label>Offsides</label>
+          <div class="metric-controls">
+            <button class="metric-btn minus-btn" onclick="updateMetric('offsides', -1)">-</button>
+            <span class="metric-value" id="offsides">0</span>
+            <button class="metric-btn plus-btn" onclick="updateMetric('offsides', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Rating Display -->
+      <div class="rating-display">
+        <div class="rating-score" id="liveRating">6.0</div>
+        <div class="rating-text">Live Performance Rating</div>
+      </div>
+
+      <!-- Substitution Section -->
+      <div class="substitution-section">
+        <h4>Substitution</h4>
+        <button onclick="handleSubstitution()">Make Substitution</button>
+        <div id="substitutionTime" style="margin-top: 0.5rem; font-size: 0.9rem;"></div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="submit-section">
+        <button class="submit-btn" onclick="submitMatchStats()">Submit Match Statistics</button>
+        <button class="reset-btn" onclick="resetAllStats()" style="margin-left: 1rem;">Reset All</button>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>
+  <p>&copy; 2025 Enejistats</p>
+</footer>
+<script src="/static/js/scout-widget.js"></script>
+</body>
+</html>
