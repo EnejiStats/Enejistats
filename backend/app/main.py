@@ -1,3 +1,19 @@
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+app = FastAPI()
+
+# Club Dashboard (future or conditional logic)
+@app.get("/club-dashboard", response_class=HTMLResponse)
+async def club_dashboard(request: Request):
+    return templates.TemplateResponse("club-dashboard.html", {"request": request})
+
+# Scout Dashboard (future or conditional logic)
+@app.get("/scout-dashboard", response_class=HTMLResponse)
+async def scout_dashboard(request: Request):
+    return templates.TemplateResponse("scout-dashboard.html", {"request": request})
+
 import os
 from fastapi import FastAPI, Request, Form, File, UploadFile, HTTPException, Response, Cookie
 from fastapi.templating import Jinja2Templates
@@ -83,6 +99,58 @@ def save_to_json(data):
         json.dump(existing, f, indent=2)
 
 # Routes
+# Home Page
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+# Leaderboard Page
+@app.get("/leaderboard", response_class=HTMLResponse)
+async def leaderboard(request: Request):
+    return templates.TemplateResponse("leaderboard.html", {"request": request})
+
+# Stats Area (general tabbed access to player/browse)
+@app.get("/stats-area", response_class=HTMLResponse)
+async def stats_area(request: Request):
+    return templates.TemplateResponse("stats-area.html", {"request": request})
+
+# Stats - Player Page
+@app.get("/stats/player", response_class=HTMLResponse)
+async def stats_player(request: Request):
+    return templates.TemplateResponse("player.html", {"request": request})
+
+# Stats - Browse Page
+@app.get("/stats/browse", response_class=HTMLResponse)
+async def stats_browse(request: Request):
+    return templates.TemplateResponse("browse.html", {"request": request})
+
+# Contact Page
+@app.get("/contact", response_class=HTMLResponse)
+async def contact(request: Request):
+    return templates.TemplateResponse("contact.html", {"request": request})
+
+# Register Page (handles redirect query param for player/club/scout)
+@app.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+# Login Page
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+# Player Profile Entry Page (e.g., form or display for a single player)
+@app.get("/player", response_class=HTMLResponse)
+async def player_page(request: Request):
+    return templates.TemplateResponse("player.html", {"request": request})
+
+# Player Dashboard (after login)
+@app.get("/player-dashboard", response_class=HTMLResponse)
+async def player_dashboard(request: Request):
+    return templates.TemplateResponse("player-dashboard.html", {"request": request})
+
+
+
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
