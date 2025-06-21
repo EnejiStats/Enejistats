@@ -3,701 +3,384 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Player Dashboard | Enejistats</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * { box-sizing: border-box; }
-    
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background-color: #f5f7fa;
-      color: #333;
-    }
-
-    header, footer {
-      background: #1e1e2f;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-
-    nav {
-      margin-top: 0.5rem;
-    }
-
-    nav a {
-      color: white;
-      margin: 0 0.75rem;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    nav a:hover {
-      text-decoration: underline;
-    }
-
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
-    .dropbtn {
-      color: white;
-      margin: 0 0.75rem;
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f5f7fa; color: #333; }
+    header, footer { background-color: #1e1e2f; color: white; padding: 1rem; text-align: center; }
+    nav a { color: white; margin: 0 0.75rem; text-decoration: none; font-weight: 500; }
+    .container { max-width: 1200px; margin: 2rem auto; padding: 1rem; }
+    .dashboard-tabs { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+    .dashboard-tabs button {
+      padding: 0.75rem 1.5rem;
+      background-color: #ccc;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: 500;
     }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #2c2c3e;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
-      border-radius: 4px;
-    }
-
-    .dropdown-content a {
-      color: white;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      margin: 0;
-    }
-
-    .dropdown-content a:hover {
-      background-color: #004aad;
-    }
-
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: 2rem auto;
-      padding: 1rem;
+    .dashboard-tabs button.active { background-color: #004aad; color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .card {
       background: white;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
     }
-
-    .tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 1rem;
+    .player-info {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 2rem;
+      align-items: start;
     }
-
-    .tab-btn {
-      padding: 0.7rem 1.2rem;
-      margin: 0 0.3rem;
-      border: none;
-      background: #ccc;
-      cursor: pointer;
-      border-radius: 5px;
-      font-size: 14px;
-      transition: background-color 0.3s;
-    }
-
-    .tab-btn:hover {
-      background: #999;
-    }
-
-    .tab-btn.active {
-      background: #004aad;
-      color: white;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .profile-card {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      background: linear-gradient(135deg, #f0f4f8 0%, #e8f2ff 100%);
-      border-radius: 12px;
-      border: 1px solid #e1e8ed;
-    }
-
-    .profile-card img {
+    .player-photo {
       width: 150px;
       height: 150px;
       border-radius: 50%;
-      border: 4px solid #004aad;
-      margin-bottom: 1rem;
       object-fit: cover;
-      box-shadow: 0 4px 12px rgba(0, 74, 173, 0.2);
+      border: 3px solid #004aad;
     }
-
-    .profile-card h2 {
-      margin: 0.5rem 0;
-      color: #004aad;
-      font-size: 1.8rem;
-    }
-
-    .profile-card p {
-      margin: 0.3rem 0;
-      font-size: 1rem;
-    }
-
-    .profile-card strong {
-      color: #333;
-    }
-
-    .card {
-      background: #f0f4f8;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      border-left: 4px solid #004aad;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .card h3 {
-      margin-top: 0;
-      color: #004aad;
-    }
-
-    .grid-2x2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin: 1rem 0;
-    }
-
-    .stat-card {
-      background: linear-gradient(135deg, #004aad 0%, #0066ff 100%);
-      color: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 74, 173, 0.3);
-    }
-
-    .stat-card .stat-number {
-      font-size: 2rem;
-      font-weight: bold;
-      display: block;
-    }
-
-    .stat-card .stat-label {
-      font-size: 0.9rem;
-      opacity: 0.9;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem 0;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    th, td {
-      padding: 0.8rem;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background: #004aad;
-      color: white;
-      font-weight: 600;
-    }
-
-    tr:hover {
-      background-color: #f8f9fa;
-    }
-
-    .footer-links {
-      margin-bottom: 1rem;
-    }
-
-    .footer-links a {
-      color: white;
-      margin: 0 0.75rem;
-      text-decoration: none;
-    }
-
-    .footer-links a:hover {
-      text-decoration: underline;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 2rem;
-      color: #666;
-    }
-
-    .error {
-      background: #ffe6e6;
-      color: #d63384;
-      padding: 1rem;
-      border-radius: 6px;
-      margin: 1rem 0;
-      border-left: 4px solid #d63384;
-    }
-
-    .player-info-grid {
+    .player-details h2 { margin: 0 0 1rem 0; color: #004aad; }
+    .player-details p { margin: 0.5rem 0; }
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 1rem;
       margin-top: 1rem;
     }
-
-    .info-item {
-      background: white;
-      padding: 0.8rem;
+    .stat-card {
+      background: #f8f9fa;
+      padding: 1rem;
       border-radius: 6px;
-      border: 1px solid #e1e8ed;
+      text-align: center;
     }
-
-    .info-item strong {
-      display: block;
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
       color: #004aad;
-      margin-bottom: 0.3rem;
     }
-
-    @media (max-width: 768px) {
-      .container {
-        margin: 1rem;
-        padding: 0.5rem;
-      }
-      
-      .tabs {
-        flex-wrap: wrap;
-      }
-      
-      .tab-btn {
-        margin: 0.2rem;
-        padding: 0.5rem 0.8rem;
-        font-size: 12px;
-      }
-      
-      .grid-2x2 {
-        grid-template-columns: 1fr;
-      }
-      
-      .profile-card img {
-        width: 120px;
-        height: 120px;
-      }
+    .stat-label {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.5rem;
     }
+    .rating-display {
+      background: linear-gradient(135deg, #004aad, #0066cc);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .rating-score {
+      font-size: 3rem;
+      font-weight: bold;
+    }
+    .rating-text {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    .bio-section, .awards-section {
+      margin-top: 2rem;
+    }
+    .bio-text, .awards-list {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 6px;
+      min-height: 100px;
+    }
+    .edit-button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+    .match-history {
+      margin-top: 2rem;
+    }
+    .match-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 100px;
+      gap: 1rem;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      align-items: center;
+    }
+    .match-rating {
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      padding: 0.5rem;
+      border-radius: 4px;
+      color: white;
+    }
+    .rating-excellent { background-color: #28a745; }
+    .rating-good { background-color: #17a2b8; }
+    .rating-average { background-color: #ffc107; color: #333; }
+    .rating-poor { background-color: #dc3545; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Enejistats</h1>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/leaderboard">Leaderboard</a>
-      <div class="dropdown">
-        <span class="dropbtn">Stats Area ▾</span>
-        <div class="dropdown-content">
-          <a href="/register?redirect=player-dashboard">Player</a>
-          <a href="/register?redirect=club-dashboard">Club</a>
-          <a href="/register?redirect=scout-dashboard">Scout</a>
-          <a href="/stats/browse">Browse</a>
-        </div>
-      </div>
-      <a href="/contact">Contact</a>
-      <a href="/register">Register</a>
-    </nav>
-  </header>
+<header>
+  <h1>Enejistats</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/scout-widget">Scout Widget</a>
+    <a href="/stats-area">Stats Area</a>
+    <a href="/leaderboard">Leaderboard</a>
+    <a href="/logout">Logout</a>
+  </nav>
+</header>
+<div class="container">
+  <div class="dashboard-tabs">
+    <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
+    <button class="tab-button" onclick="switchTab('stats')">Statistics</button>
+    <button class="tab-button" onclick="switchTab('bio')">Bio</button>
+    <button class="tab-button" onclick="switchTab('awards')">Awards</button>
+  </div>
 
-  <div class="container">
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
-      <button class="tab-btn" onclick="switchTab('stats')">Stats</button>
-      <button class="tab-btn" onclick="switchTab('match')">Match Centre</button>
-    </div>
-
-    <div id="loading" class="loading">
-      <p>Loading player information...</p>
-    </div>
-
-    <div id="error-message" class="error" style="display: none;">
-      <p>Error loading player data. Please try again later.</p>
-    </div>
-
-    <div id="overview" class="tab-content active" style="display: none;">
-      <div class="profile-card">
-        <img id="player-photo" alt="Player Photo" src="https://via.placeholder.com/150/004aad/white?text=Player">
-        <h2 id="player-name">Loading...</h2>
-        <div class="player-info-grid">
-          <div class="info-item">
-            <strong>Date of Birth:</strong>
-            <span id="player-dob">-</span> (<span id="player-age">-</span> years)
-          </div>
-          <div class="info-item">
-            <strong>Nationality:</strong>
-            <span id="player-nationality">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Position:</strong>
-            <span id="player-position">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Current Club:</strong>
-            <span id="player-club">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Height:</strong>
-            <span id="player-height">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Weight:</strong>
-            <span id="player-weight">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Email:</strong>
-            <span id="player-email">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Phone:</strong>
-            <span id="player-phone">-</span>
-          </div>
-          <div class="info-item">
-            <strong>State:</strong>
-            <span id="player-state">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Local Govt:</strong>
-            <span id="player-lga">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Previous Club:</strong>
-            <span id="player-prev-club">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Jersey Number:</strong>
-            <span id="player-jersey">-</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="card">
-        <h3>Player Bio</h3>
-        <p id="player-bio"><em>Bio information will be updated via onboard widget.</em></p>
-      </div>
-      
-      <div class="card">
-        <h3>Achievements</h3>
-        <p id="player-achievements"><em>Achievements will be updated via onboard widget.</em></p>
-      </div>
-      
-      <div class="card">
-        <h3>Additional Information</h3>
-        <div class="player-info-grid">
-          <div class="info-item">
-            <strong>Agent Name:</strong>
-            <span id="agent-name">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Agent Phone:</strong>
-            <span id="agent-phone">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Emergency Contact:</strong>
-            <span id="emergency-contact">-</span>
-          </div>
-          <div class="info-item">
-            <strong>Emergency Phone:</strong>
-            <span id="emergency-phone">-</span>
-          </div>
+  <!-- Overview Tab -->
+  <div id="overview" class="tab-content active">
+    <div class="card">
+      <div class="player-info">
+        <img src="/static/uploads/{{ player.photo or 'default-player.jpg' }}" alt="Player Photo" class="player-photo">
+        <div class="player-details">
+          <h2>{{ player.firstName }} {{ player.middleName }} {{ player.lastName }}</h2>
+          <p><strong>Position:</strong> {{ player.preferredPosition }}</p>
+          <p><strong>Club:</strong> {{ player.club }}</p>
+          <p><strong>League:</strong> {{ player.league }}</p>
+          <p><strong>Age:</strong> {{ player.age or 'N/A' }}</p>
+          <p><strong>Nationality:</strong> {{ player.nationality }}</p>
         </div>
       </div>
     </div>
 
-    <div id="stats" class="tab-content">
-      <h3>Performance Statistics</h3>
-      <div class="grid-2x2">
+    {% if player_stats %}
+    <div class="card">
+      <h3>Recent Performance</h3>
+      <div class="rating-display">
+        <div class="rating-score">{{ player_stats[0].performance_rating or 'N/A' }}</div>
+        <div class="rating-text">Latest Match Rating</div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Statistics Tab -->
+  <div id="stats" class="tab-content">
+    <div class="card">
+      <h3>Match Statistics</h3>
+      <div class="stats-grid">
         <div class="stat-card">
-          <span class="stat-number" id="stat-goals">0</span>
-          <span class="stat-label">Goals</span>
+          <div class="stat-value">{{ player_stats|length or 0 }}</div>
+          <div class="stat-label">Matches Played</div>
         </div>
         <div class="stat-card">
-          <span class="stat-number" id="stat-assists">0</span>
-          <span class="stat-label">Assists</span>
+          <div class="stat-value">
+            {% if player_stats %}
+              {{ "%.1f"|format(player_stats|map(attribute='performance_rating')|sum / player_stats|length) }}
+            {% else %}
+              N/A
+            {% endif %}
+          </div>
+          <div class="stat-label">Average Rating</div>
         </div>
         <div class="stat-card">
-          <span class="stat-number" id="stat-pass-accuracy">0%</span>
-          <span class="stat-label">Pass Accuracy</span>
+          <div class="stat-value">
+            {% if player_stats %}
+              {{ player_stats|map(attribute='stats.goals')|sum or 0 }}
+            {% else %}
+              0
+            {% endif %}
+          </div>
+          <div class="stat-label">Total Goals</div>
         </div>
         <div class="stat-card">
-          <span class="stat-number" id="stat-matches">0</span>
-          <span class="stat-label">Matches Played</span>
+          <div class="stat-value">
+            {% if player_stats %}
+              {{ player_stats|map(attribute='stats.assists')|sum or 0 }}
+            {% else %}
+              0
+            {% endif %}
+          </div>
+          <div class="stat-label">Total Assists</div>
         </div>
       </div>
       
-      <div class="card">
-        <h3>Detailed Statistics</h3>
-        <p><em>Detailed performance metrics will be available once match data is recorded.</em></p>
+      <div class="match-history">
+        <h4>Match History</h4>
+        {% for match in player_stats %}
+        <div class="match-item">
+          <div>{{ match.home_team }} vs {{ match.away_team }}</div>
+          <div>{{ match.match_date }}</div>
+          <div>{{ match.league }}</div>
+          <div class="match-rating {% if match.performance_rating >= 8 %}rating-excellent{% elif match.performance_rating >= 7 %}rating-good{% elif match.performance_rating >= 6 %}rating-average{% else %}rating-poor{% endif %}">
+            {{ match.performance_rating }}
+          </div>
+        </div>
+        {% endfor %}
       </div>
-    </div>
-
-    <div id="match" class="tab-content">
-      <h3>Upcoming Fixtures</h3>
-      <table id="upcoming-fixtures">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Match</th>
-            <th>Venue</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="4" style="text-align: center; color: #666;">No upcoming fixtures scheduled</td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <h3>Recent Results</h3>
-      <table id="recent-results">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Match</th>
-            <th>Score</th>
-            <th>Result</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td colspan="4" style="text-align: center; color: #666;">No recent matches recorded</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   </div>
 
-  <footer>
-    <div class="footer-links">
-      <a href="/">Home</a>
-      <a href="/leaderboard">Leaderboard</a>
-      <a href="/stats/browse">Browse</a>
-      <a href="/register">Register</a>
+  <!-- Bio Tab -->
+  <div id="bio" class="tab-content">
+    <div class="card">
+      <h3>Player Bio 
+        <button class="edit-button" onclick="editBio()">Edit</button>
+      </h3>
+      <div class="bio-section">
+        <div id="bioDisplay" class="bio-text">{{ player.bio or 'No bio available. Click Edit to add your bio.' }}</div>
+        <textarea id="bioEdit" class="bio-text" style="display: none; width: 100%; min-height: 100px;">{{ player.bio or '' }}</textarea>
+        <button id="saveBio" style="display: none;" onclick="saveBio()">Save</button>
+        <button id="cancelBio" style="display: none;" onclick="cancelBioEdit()">Cancel</button>
+      </div>
     </div>
-    <p>&copy; <span id="year"></span> Enejistats</p>
-  </footer>
+  </div>
 
-  <script>
-    // Global player data
-    let playerData = null;
+  <!-- Awards Tab -->
+  <div id="awards" class="tab-content">
+    <div class="card">
+      <h3>Awards & Achievements 
+        <button class="edit-button" onclick="editAwards()">Edit</button>
+      </h3>
+      <div class="awards-section">
+        <div id="awardsDisplay" class="awards-list">
+          {% if player.awards %}
+            {% for award in player.awards %}
+              <p>• {{ award }}</p>
+            {% endfor %}
+          {% else %}
+            No awards recorded. Click Edit to add your achievements.
+          {% endif %}
+        </div>
+        <textarea id="awardsEdit" class="awards-list" style="display: none; width: 100%; min-height: 100px;" placeholder="Enter awards and achievements, one per line">{% if player.awards %}{% for award in player.awards %}{{ award }}
+{% endfor %}{% endif %}</textarea>
+        <button id="saveAwards" style="display: none;" onclick="saveAwards()">Save</button>
+        <button id="cancelAwards" style="display: none;" onclick="cancelAwardsEdit()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>
+  <p>&copy; 2025 Enejistats</p>
+</footer>
+<script>
+function switchTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Remove active class from all buttons
+  document.querySelectorAll('.tab-button').forEach(button => {
+    button.classList.remove('active');
+  });
+  
+  // Show selected tab and mark button as active
+  document.getElementById(tabName).classList.add('active');
+  event.target.classList.add('active');
+}
 
-    // Calculate age from date of birth
-    function calculateAge(dobString) {
-      if (!dobString) return '-';
-      const dob = new Date(dobString);
-      const today = new Date();
-      let age = today.getFullYear() - dob.getFullYear();
-      const monthDiff = today.getMonth() - dob.getMonth();
-      
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-        age--;
-      }
-      return age;
+function editBio() {
+  document.getElementById('bioDisplay').style.display = 'none';
+  document.getElementById('bioEdit').style.display = 'block';
+  document.getElementById('saveBio').style.display = 'inline-block';
+  document.getElementById('cancelBio').style.display = 'inline-block';
+}
+
+function cancelBioEdit() {
+  document.getElementById('bioDisplay').style.display = 'block';
+  document.getElementById('bioEdit').style.display = 'none';
+  document.getElementById('saveBio').style.display = 'none';
+  document.getElementById('cancelBio').style.display = 'none';
+}
+
+async function saveBio() {
+  const bioText = document.getElementById('bioEdit').value;
+  
+  try {
+    const response = await fetch('/api/update-player-bio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        player_id: '{{ player._id }}',
+        bio: bioText
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      document.getElementById('bioDisplay').textContent = bioText || 'No bio available.';
+      cancelBioEdit();
+      alert('Bio updated successfully!');
+    } else {
+      alert('Failed to update bio: ' + result.message);
     }
+  } catch (error) {
+    alert('Error updating bio: ' + error.message);
+  }
+}
 
-    // Format date for display
-    function formatDate(dateString) {
-      if (!dateString) return '-';
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-GB');
-    }
+function editAwards() {
+  document.getElementById('awardsDisplay').style.display = 'none';
+  document.getElementById('awardsEdit').style.display = 'block';
+  document.getElementById('saveAwards').style.display = 'inline-block';
+  document.getElementById('cancelAwards').style.display = 'inline-block';
+}
 
-    // Get position display text
-    function getPositionText(positions) {
-      if (!positions || positions.length === 0) return '-';
-      return positions.join(', ');
-    }
+function cancelAwardsEdit() {
+  document.getElementById('awardsDisplay').style.display = 'block';
+  document.getElementById('awardsEdit').style.display = 'none';
+  document.getElementById('saveAwards').style.display = 'none';
+  document.getElementById('cancelAwards').style.display = 'none';
+}
 
-    // Populate player dashboard with data
-    function populatePlayerDashboard(data) {
-      if (!data) return;
-
-      // Basic Information
-      document.getElementById('player-name').textContent = `${data.first_name || ''} ${data.last_name || ''}`.trim();
-      document.getElementById('player-dob').textContent = formatDate(data.date_of_birth);
-      document.getElementById('player-age').textContent = calculateAge(data.date_of_birth);
-      document.getElementById('player-nationality').textContent = data.nationality || '-';
-      document.getElementById('player-position').textContent = getPositionText(data.preferred_positions);
-      document.getElementById('player-club').textContent = data.current_club || '-';
-      document.getElementById('player-height').textContent = data.height ? `${data.height} cm` : '-';
-      document.getElementById('player-weight').textContent = data.weight ? `${data.weight} kg` : '-';
-      document.getElementById('player-email').textContent = data.email || '-';
-      document.getElementById('player-phone').textContent = data.phone || '-';
-      document.getElementById('player-state').textContent = data.state || '-';
-      document.getElementById('player-lga').textContent = data.lga || '-';
-      document.getElementById('player-prev-club').textContent = data.previous_club || '-';
-      document.getElementById('player-jersey').textContent = data.jersey_number || '-';
-
-      // Agent Information
-      document.getElementById('agent-name').textContent = data.agent_name || '-';
-      document.getElementById('agent-phone').textContent = data.agent_phone || '-';
-
-      // Emergency Contact
-      document.getElementById('emergency-contact').textContent = data.emergency_contact || '-';
-      document.getElementById('emergency-phone').textContent = data.emergency_phone || '-';
-
-      // Photo
-      const photoElement = document.getElementById('player-photo');
-      if (data.photo_url && data.photo_url !== 'undefined') {
-        photoElement.src = data.photo_url;
-        photoElement.onerror = function() {
-          this.src = 'https://via.placeholder.com/150/004aad/white?text=' + encodeURIComponent((data.first_name || 'Player').charAt(0));
-        };
+async function saveAwards() {
+  const awardsText = document.getElementById('awardsEdit').value;
+  const awards = awardsText.split('\n').filter(award => award.trim().length > 0);
+  
+  try {
+    const response = await fetch('/api/update-player-awards', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        player_id: '{{ player._id }}',
+        awards: awards
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      const displayDiv = document.getElementById('awardsDisplay');
+      if (awards.length > 0) {
+        displayDiv.innerHTML = awards.map(award => `<p>• ${award}</p>`).join('');
       } else {
-        photoElement.src = 'https://via.placeholder.com/150/004aad/white?text=' + encodeURIComponent((data.first_name || 'Player').charAt(0));
+        displayDiv.textContent = 'No awards recorded.';
       }
-
-      // Stats (placeholder - would come from match data)
-      document.getElementById('stat-goals').textContent = data.stats?.goals || '0';
-      document.getElementById('stat-assists').textContent = data.stats?.assists || '0';
-      document.getElementById('stat-pass-accuracy').textContent = data.stats?.pass_accuracy ? `${data.stats.pass_accuracy}%` : '0%';
-      document.getElementById('stat-matches').textContent = data.stats?.matches_played || '0';
+      cancelAwardsEdit();
+      alert('Awards updated successfully!');
+    } else {
+      alert('Failed to update awards: ' + result.message);
     }
-
-    // Fetch player data from backend
-    async function fetchPlayerData() {
-      try {
-        // Get player ID from URL parameters or session storage
-        const urlParams = new URLSearchParams(window.location.search);
-        const playerId = urlParams.get('id') || sessionStorage.getItem('player_id');
-        
-        if (!playerId) {
-          throw new Error('No player ID found');
-        }
-
-        const response = await fetch(`/api/player/${playerId}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          playerData = data.player;
-          populatePlayerDashboard(playerData);
-          
-          // Hide loading, show content
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('overview').style.display = 'block';
-        } else {
-          throw new Error(data.error || 'Failed to fetch player data');
-        }
-        
-      } catch (error) {
-        console.error('Error fetching player data:', error);
-        
-        // Hide loading, show error
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error-message').style.display = 'block';
-        
-        // Load sample data for demonstration
-        loadSampleData();
-      }
-    }
-
-    // Load sample data for demonstration purposes
-    function loadSampleData() {
-      const sampleData = {
-        first_name: "John",
-        last_name: "Doe",
-        date_of_birth: "2000-01-15",
-        nationality: "Nigeria",
-        preferred_positions: ["Central Midfielder", "Attacking Midfielder"],
-        current_club: "Lagos Stars FC",
-        height: 180,
-        weight: 75,
-        email: "john.doe@example.com",
-        phone: "+234-800-123-4567",
-        state: "Lagos",
-        lga: "Lagos Island",
-        previous_club: "Youth Academy FC",
-        jersey_number: "10",
-        agent_name: "Smith Johnson",
-        agent_phone: "+234-800-987-6543",
-        emergency_contact: "Jane Doe",
-        emergency_phone: "+234-800-555-1234",
-        photo_url: "https://via.placeholder.com/150/004aad/white?text=JD",
-        stats: {
-          goals: 12,
-          assists: 8,
-          pass_accuracy: 85,
-          matches_played: 20
-        }
-      };
-
-      playerData = sampleData;
-      populatePlayerDashboard(sampleData);
-      
-      // Hide loading, show content
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('overview').style.display = 'block';
-      document.getElementById('error-message').style.display = 'none';
-    }
-
-    // Switch between tabs
-    function switchTab(tabId) {
-      // Hide all tab contents
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-        content.style.display = 'none';
-      });
-      
-      // Remove active class from all buttons
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      
-      // Show selected tab and activate button
-      const selectedTab = document.getElementById(tabId);
-      const selectedBtn = document.querySelector(`[onclick*='${tabId}']`);
-      
-      if (selectedTab && selectedBtn) {
-        selectedTab.classList.add('active');
-        selectedTab.style.display = 'block';
-        selectedBtn.classList.add('active');
-      }
-    }
-
-    // Initialize dashboard
-    function initializeDashboard() {
-      // Set current year in footer
-      document.getElementById('year').textContent = new Date().getFullYear();
-      
-      // Fetch player data
-      fetchPlayerData();
-    }
-
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', initializeDashboard);
-
-    // Refresh data function (can be called externally)
-    function refreshPlayerData() {
-      document.getElementById('loading').style.display = 'block';
-      document.getElementById('overview').style.display = 'none';
-      document.getElementById('error-message').style.display = 'none';
-      fetchPlayerData();
-    }
-
-    // Export functions for external use
-    window.switchTab = switchTab;
-    window.refreshPlayerData = refreshPlayerData;
-  </script>
+  } catch (error) {
+    alert('Error updating awards: ' + error.message);
+  }
+}
+</script>
 </body>
 </html>
