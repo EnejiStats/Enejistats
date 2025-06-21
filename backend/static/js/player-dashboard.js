@@ -1,43 +1,108 @@
-// Sample player data simulation (replace with real fetch if backend-connected)
-const player = {
-  first_name: "John",
-  last_name: "Doe",
-  dob: "2000-01-15",
-  nationality: "Nigeria",
-  preferred_position: "CM - Midfielder",
-  club: "Lagos Stars FC",
-  photo_url: "https://via.placeholder.com/150"
-};
 
-function calculateAge(dobString) {
-  const dob = new Date(dobString);
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  if (
-    today.getMonth() < dob.getMonth() ||
-    (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())
-  ) {
-    age--;
+function switchTab(tabName) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Remove active class from all buttons
+  document.querySelectorAll('.tab-button').forEach(button => {
+    button.classList.remove('active');
+  });
+  
+  // Show selected tab and mark button as active
+  document.getElementById(tabName).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function editBio() {
+  document.getElementById('bioDisplay').style.display = 'none';
+  document.getElementById('bioEdit').style.display = 'block';
+  document.getElementById('saveBio').style.display = 'inline-block';
+  document.getElementById('cancelBio').style.display = 'inline-block';
+}
+
+function cancelBioEdit() {
+  document.getElementById('bioDisplay').style.display = 'block';
+  document.getElementById('bioEdit').style.display = 'none';
+  document.getElementById('saveBio').style.display = 'none';
+  document.getElementById('cancelBio').style.display = 'none';
+}
+
+async function saveBio() {
+  const bioText = document.getElementById('bioEdit').value;
+  
+  try {
+    const response = await fetch('/api/update-player-bio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        player_id: '{{ player._id }}',
+        bio: bioText
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      document.getElementById('bioDisplay').textContent = bioText || 'No bio available.';
+      cancelBioEdit();
+      alert('Bio updated successfully!');
+    } else {
+      alert('Failed to update bio: ' + result.message);
+    }
+  } catch (error) {
+    alert('Error updating bio: ' + error.message);
   }
-  return age;
 }
 
-function populatePlayerDashboard() {
-  document.getElementById("player-name").textContent = `${player.first_name} ${player.last_name}`;
-  document.getElementById("player-dob").textContent = player.dob;
-  document.getElementById("player-age").textContent = calculateAge(player.dob);
-  document.getElementById("player-nationality").textContent = player.nationality;
-  document.getElementById("player-position").textContent = player.preferred_position;
-  document.getElementById("player-club").textContent = player.club;
-  document.getElementById("player-photo").src = player.photo_url;
+function editAwards() {
+  document.getElementById('awardsDisplay').style.display = 'none';
+  document.getElementById('awardsEdit').style.display = 'block';
+  document.getElementById('saveAwards').style.display = 'inline-block';
+  document.getElementById('cancelAwards').style.display = 'inline-block';
 }
 
-function switchTab(tabId) {
-  document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById(tabId).classList.add("active");
-  document.querySelector(`.tab-btn[onclick*='${tabId}']`).classList.add("active");
+function cancelAwardsEdit() {
+  document.getElementById('awardsDisplay').style.display = 'block';
+  document.getElementById('awardsEdit').style.display = 'none';
+  document.getElementById('saveAwards').style.display = 'none';
+  document.getElementById('cancelAwards').style.display = 'none';
 }
 
-window.onload = populatePlayerDashboard;
-
+async function saveAwards() {
+  const awardsText = document.getElementById('awardsEdit').value;
+  const awards = awardsText.split('\n').filter(award => award.trim().length > 0);
+  
+  try {
+    const response = await fetch('/api/update-player-awards', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        player_id: '{{ player._id }}',
+        awards: awards
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      const displayDiv = document.getElementById('awardsDisplay');
+      if (awards.length > 0) {
+        displayDiv.innerHTML = awards.map(award => `<p>• ${award}</p>`).join('');
+      } else {
+        displayDiv.textContent = 'No awards recorded.';
+      }
+      cancelAwardsEdit();
+      alert('Awards updated successfully!');
+    } else {
+      alert('Failed to update awards: ' + result.message);
+    }
+  } catch (error) {
+    alert('Error updating awards: ' + error.message);
+  }
+}
